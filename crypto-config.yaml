@@ -11,18 +11,12 @@ OrdererOrgs:
   # Orderer
   # ---------------------------------------------------------------------------
   - Name: Orderer
-    Domain: example.com
-    EnableNodeOUs: true
+    Domain: projectacme.com
     # ---------------------------------------------------------------------------
     # "Specs" - See PeerOrgs below for complete description
     # ---------------------------------------------------------------------------
     Specs:
       - Hostname: orderer
-      - Hostname: orderer2
-      - Hostname: orderer3
-      - Hostname: orderer4
-      - Hostname: orderer5
-
 # ---------------------------------------------------------------------------
 # "PeerOrgs" - Definition of organizations managing peer nodes
 # ---------------------------------------------------------------------------
@@ -31,8 +25,7 @@ PeerOrgs:
   # Org1
   # ---------------------------------------------------------------------------
   - Name: Org1
-    Domain: org1.example.com
-    EnableNodeOUs: true
+    Domain: org1.projectacme.com
     # ---------------------------------------------------------------------------
     # "Specs"
     # ---------------------------------------------------------------------------
@@ -50,8 +43,8 @@ PeerOrgs:
     #                 Org.Domain, respectively.
     # ---------------------------------------------------------------------------
     # Specs:
-    #   - Hostname: foo # implicitly "foo.org1.example.com"
-    #     CommonName: foo27.org5.example.com # overrides Hostname-based FQDN set above
+    #   - Hostname: foo # implicitly "foo.org1.projectacme.com"
+    #     CommonName: foo27.org5.projectacme.com # overrides Hostname-based FQDN set above
     #   - Hostname: bar
     #   - Hostname: baz
     # ---------------------------------------------------------------------------
@@ -67,7 +60,7 @@ PeerOrgs:
     # name collisions
     # ---------------------------------------------------------------------------
     Template:
-      Count: 2
+      Count: 1
       # Start: 5
       # Hostname: {{.Prefix}}{{.Index}} # default
     # ---------------------------------------------------------------------------
@@ -75,15 +68,5 @@ PeerOrgs:
     # ---------------------------------------------------------------------------
     # Count: The number of user accounts _in addition_ to Admin
     # ---------------------------------------------------------------------------
-    Users:
-      Count: 1
-  # ---------------------------------------------------------------------------
-  # Org2: See "Org1" for full specification
-  # ---------------------------------------------------------------------------
-  - Name: Org2
-    Domain: org2.example.com
-    EnableNodeOUs: true
-    Template:
-      Count: 2
     Users:
       Count: 1
