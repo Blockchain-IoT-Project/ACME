@@ -1,7 +1,5 @@
 /*
-Copyright IBM Corp., DTCC All Rights Reserved.
-
-SPDX-License-Identifier: Apache-2.0
+Project ACME chaincode
 */
 package org.hyperledger.fabric.example;
 
@@ -23,15 +21,21 @@ public class SimpleChaincode extends ChaincodeBase {
     @Override
     public Response init(ChaincodeStub stub) {
         try {
-            _logger.info("Init java simple chaincode");
+            _logger.info("Init java sensor chaincode");
             String func = stub.getFunction();
             if (!func.equals("init")) {
                 return newErrorResponse("function other than init is not supported");
             }
             List<String> args = stub.getParameters();
-            if (args.size() != 4) {
-                newErrorResponse("Incorrect number of arguments. Expecting 4");
+            if (args.size() != 1) {
+                newErrorResponse("Incorrect number of arguments. Expecting 1");
             }
+
+            //Define the unit of measurement for this channel
+            String unit = args.get(0);
+            _logger.info(String.format("Defining unit %s for this channel", unit));
+
+            stub.putStringState("unit", unit);
             /*
             // Initialize the chaincode
             String account1Key = args.get(0);
@@ -45,6 +49,7 @@ public class SimpleChaincode extends ChaincodeBase {
 
             stub.putStringState("1", "5");
 			*/
+
             return newSuccessResponse();
         } catch (Throwable e) {
             return newErrorResponse(e);
@@ -54,7 +59,7 @@ public class SimpleChaincode extends ChaincodeBase {
     @Override
     public Response invoke(ChaincodeStub stub) {
         try {
-            _logger.info("Invoke java simple chaincode");
+            _logger.info("Invoke java sensor chaincode");
             String func = stub.getFunction();
             List<String> params = stub.getParameters();
             /*if (func.equals("invoke")) {
@@ -64,13 +69,16 @@ public class SimpleChaincode extends ChaincodeBase {
                 return delete(stub, params);
             }
             */
+            if (func.equals("getUnit")) {
+            	return getUnit(stub, params);
+            }
             if (func.equals("write")) {
-       			return write(stub, params);				
-            } 
+       			return write(stub, params);
+            }
             if (func.equals("query")) {
                 return query(stub, params);
             }
-            return newErrorResponse("Invalid invoke function name. Expecting one of: [\"write\",\"query\"]");
+            return newErrorResponse("Invalid invoke function name. Expecting one of: [\"write\", \"query\", \"getUnit\"]");
         } catch (Throwable e) {
             return newErrorResponse(e);
         }
@@ -130,7 +138,7 @@ public class SimpleChaincode extends ChaincodeBase {
     // query callback representing the query of a chaincode
     private Response query(ChaincodeStub stub, List<String> args) {
         if (args.size() != 1) {
-            return newErrorResponse("Incorrect number of arguments. Expecting name of the sensor to query");
+            return newErrorResponse("Incorrect number of parameters. Expecting 1");
         }
         String key = args.get(0);
 
@@ -138,28 +146,44 @@ public class SimpleChaincode extends ChaincodeBase {
         if (val == null) {
             return newErrorResponse(String.format("Error: state for %s is null", key));
         }
-        _logger.info(String.format("Query Response:\nName: %s, Amount: %s\n", key, val));
+        _logger.info(String.format("Query Response:\nTag: %s, Value: %s\n", key, val));
         return newSuccessResponse(val, ByteString.copyFrom(val, UTF_8).toByteArray());
     }
 
-	//write callback representing the addition of a new sensor record to the blockchian
+	// write callback representing the addition of a new sensor record to the blockchian
     private Response write(ChaincodeStub stub, List<String> params) {
    		if(params.size() != 2) {
    			return newErrorResponse("Invalid number of parameters. Expecting 2");
    		}
-    
+
    		String itemTag = params.get(0);
    		int sensorValue = Integer.parseInt(params.get(1));
-    
+
    		_logger.info(String.format("Writing sensor value %s to item-tag %s", sensorValue, itemTag));
-    
+
+		if (itemTag.equals("unit")) {
+			return newErrorResponse(String.format("Reserved keyword \"%s\"", itemTag));
+		}
+
    		stub.putStringState(itemTag, Integer.toString(sensorValue));
-    
+
    		_logger.info("Write complete");
-    
+
   		return newSuccessResponse("write finished successfully", ByteString.copyFrom(itemTag + ": " + sensorValue, UTF_8).toByteArray());
-    
     }
+
+	// query callback to get the channel's unit of measurement
+	private Response getUnit(ChaincodeStub stub, List<String> args) {
+		if (args.size() != 0) {
+			return newErrorResponse("Incorrect number of parameters. Expecting 0");
+		}
+
+		_logger.info("Returning unit of measurement for this channel.");
+
+		String unit = stub.getStringState("unit");
+
+		return newSuccessResponse(unit, ByteString.copyFrom(unit, UTF_8).toByteArray());
+	}
 
     public static void main(String[] args) {
         System.out.println("OpenSSL avaliable: " + OpenSsl.isAvailable());
