@@ -12,7 +12,7 @@ export MSYS_NO_PATHCONV=1
 
 docker-compose -f docker-compose.yml down
 
-docker-compose -f docker-compose.yml up -d ca.projectacme.com orderer.projectacme.com peer0.org1.projectacme.com couchdb
+docker-compose -f docker-compose.yml up -d ca.projectacme.com orderer.projectacme.com peer0.org1.projectacme.com peer0.org2.projectacme.com couchdb cli
 docker ps -a
 
 # wait for Hyperledger Fabric to start
@@ -25,3 +25,5 @@ sleep ${FABRIC_START_TIMEOUT}
 docker exec -e "CORE_PEER_LOCALMSPID=Org1MSP" -e "CORE_PEER_MSPCONFIGPATH=/etc/hyperledger/msp/users/Admin@org1.projectacme.com/msp" peer0.org1.projectacme.com peer channel create -o orderer.projectacme.com:7050 -c mychannel -f /etc/hyperledger/configtx/channel.tx
 # Join peer0.org1.projectacme.com to the channel.
 docker exec -e "CORE_PEER_LOCALMSPID=Org1MSP" -e "CORE_PEER_MSPCONFIGPATH=/etc/hyperledger/msp/users/Admin@org1.projectacme.com/msp" peer0.org1.projectacme.com peer channel join -b mychannel.block
+
+docker exec -e "CORE_PEER_LOCALMSPID=Org2MSP" -e "CORE_PEER_MSPCONFIGPATH=/etc/hyperledger/msp/users/Admin@org2.projectacme.com/msp" peer0.org2.projectacme.com peer channel join -b mychannel.block

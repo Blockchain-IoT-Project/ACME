@@ -44,6 +44,14 @@ Organizations:
             - Host: peer0.org1.projectacme.com
               Port: 7051
 
+    - &Org2
+        Name: Org2MSP
+        ID: Org2MSP
+        MSPDir: crypto-config/peerOrganizations/org2.projectacme.com/msp
+        AnchorPeers:
+             - Host: peer0.org2.projectacme.com
+               Port: 7051
+
 ################################################################################
 #
 #   SECTION: Application
