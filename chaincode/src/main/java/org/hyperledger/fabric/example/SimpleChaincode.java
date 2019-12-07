@@ -32,6 +32,7 @@ public class SimpleChaincode extends ChaincodeBase {
             if (args.size() != 4) {
                 newErrorResponse("Incorrect number of arguments. Expecting 4");
             }
+            /*
             // Initialize the chaincode
             String account1Key = args.get(0);
             int account1Value = Integer.parseInt(args.get(1));
@@ -42,6 +43,8 @@ public class SimpleChaincode extends ChaincodeBase {
             stub.putStringState(account1Key, args.get(1));
             stub.putStringState(account2Key, args.get(3));
 
+            stub.putStringState("1", "5");
+			*/
             return newSuccessResponse();
         } catch (Throwable e) {
             return newErrorResponse(e);
@@ -54,21 +57,26 @@ public class SimpleChaincode extends ChaincodeBase {
             _logger.info("Invoke java simple chaincode");
             String func = stub.getFunction();
             List<String> params = stub.getParameters();
-            if (func.equals("invoke")) {
+            /*if (func.equals("invoke")) {
                 return invoke(stub, params);
             }
             if (func.equals("delete")) {
                 return delete(stub, params);
             }
+            */
+            if (func.equals("write")) {
+       			return write(stub, params);				
+            } 
             if (func.equals("query")) {
                 return query(stub, params);
             }
-            return newErrorResponse("Invalid invoke function name. Expecting one of: [\"invoke\", \"delete\", \"query\"]");
+            return newErrorResponse("Invalid invoke function name. Expecting one of: [\"write\",\"query\"]");
         } catch (Throwable e) {
             return newErrorResponse(e);
         }
     }
 
+	/*
     private Response invoke(ChaincodeStub stub, List<String> args) {
         if (args.size() != 3) {
             return newErrorResponse("Incorrect number of arguments. Expecting 3");
@@ -118,20 +126,39 @@ public class SimpleChaincode extends ChaincodeBase {
         stub.delState(key);
         return newSuccessResponse();
     }
-
+	*/
     // query callback representing the query of a chaincode
     private Response query(ChaincodeStub stub, List<String> args) {
         if (args.size() != 1) {
-            return newErrorResponse("Incorrect number of arguments. Expecting name of the person to query");
+            return newErrorResponse("Incorrect number of arguments. Expecting name of the sensor to query");
         }
         String key = args.get(0);
-        //byte[] stateBytes
+
         String val	= stub.getStringState(key);
         if (val == null) {
             return newErrorResponse(String.format("Error: state for %s is null", key));
         }
         _logger.info(String.format("Query Response:\nName: %s, Amount: %s\n", key, val));
         return newSuccessResponse(val, ByteString.copyFrom(val, UTF_8).toByteArray());
+    }
+
+	//write callback representing the addition of a new sensor record to the blockchian
+    private Response write(ChaincodeStub stub, List<String> params) {
+   		if(params.size() != 2) {
+   			return newErrorResponse("Invalid number of parameters. Expecting 2");
+   		}
+    
+   		String itemTag = params.get(0);
+   		int sensorValue = Integer.parseInt(params.get(1));
+    
+   		_logger.info(String.format("Writing sensor value %s to item-tag %s", sensorValue, itemTag));
+    
+   		stub.putStringState(itemTag, Integer.toString(sensorValue));
+    
+   		_logger.info("Write complete");
+    
+  		return newSuccessResponse("write finished successfully", ByteString.copyFrom(itemTag + ": " + sensorValue, UTF_8).toByteArray());
+    
     }
 
     public static void main(String[] args) {
