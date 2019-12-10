@@ -7,7 +7,6 @@ echo "\___ \    | |     / _ \   | |_) |   | |  "
 echo " ___) |   | |    / ___ \  |  _ <    | |  "
 echo "|____/    |_|   /_/   \_\ |_| \_\   |_|  "
 echo
-echo "Build your first network (BYFN) end-to-end test"
 echo
 CHANNEL_NAME="$1"
 DELAY="$2"
@@ -92,11 +91,9 @@ if [ "${NO_CHAINCODE}" != "true" ]; then
 	echo "Install chaincode on peer0.org2..."
 	installChaincode 0 2
 
-	# Instantiate chaincode on peer0.org2
+	# Instantiate chaincode on peer0.org2 and peer0.org1
 	echo "Instantiating chaincode on peer0.org2..."
 	instantiateChaincode 0 2
-
-	# Instantiate chaincode on peer0.org1
 	echo "Instantiating chaincode on peer0.org2..."
 	instantiateChaincode 0 1
 
@@ -112,10 +109,9 @@ if [ "${NO_CHAINCODE}" != "true" ]; then
 	echo "Querying chaincode on peer0.org1..."
 	chaincodeQuery 0 1 4
 
-	# Query on chaincode on peer1.org2, check if the result is 90
+	# Now query on chaincode on peer1.org2
 	echo "Querying chaincode on peer1.org2..."
 	chaincodeQuery 1 2 4
-	
 fi
 
 echo
