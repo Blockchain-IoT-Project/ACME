@@ -507,8 +507,8 @@ COMPOSE_FILE_RAFT2=docker-compose-etcdraft2.yaml
 # certificate authorities compose file
 COMPOSE_FILE_CA=docker-compose-ca.yaml
 #
-# use golang as the default language for chaincode
-LANGUAGE=golang
+# use java as the default language for chaincode
+LANGUAGE=java
 # default image tag
 IMAGETAG="latest"
 # default consensus type
