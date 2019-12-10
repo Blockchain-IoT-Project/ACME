@@ -4,6 +4,8 @@ Project ACME chaincode
 package org.hyperledger.fabric.example;
 
 import java.util.List;
+import java.time.format.DateTimeFormatter;
+import java.time.LocalDateTime;
 
 import com.google.protobuf.ByteString;
 import io.netty.handler.ssl.OpenSsl;
@@ -36,19 +38,6 @@ public class SimpleChaincode extends ChaincodeBase {
             _logger.info(String.format("Defining unit %s for this channel", unit));
 
             stub.putStringState("unit", unit);
-            /*
-            // Initialize the chaincode
-            String account1Key = args.get(0);
-            int account1Value = Integer.parseInt(args.get(1));
-            String account2Key = args.get(2);
-            int account2Value = Integer.parseInt(args.get(3));
-
-            _logger.info(String.format("account %s, value = %s; account %s, value %s", account1Key, account1Value, account2Key, account2Value));
-            stub.putStringState(account1Key, args.get(1));
-            stub.putStringState(account2Key, args.get(3));
-
-            stub.putStringState("1", "5");
-			*/
 
             return newSuccessResponse();
         } catch (Throwable e) {
@@ -62,13 +51,7 @@ public class SimpleChaincode extends ChaincodeBase {
             _logger.info("Invoke java sensor chaincode");
             String func = stub.getFunction();
             List<String> params = stub.getParameters();
-            /*if (func.equals("invoke")) {
-                return invoke(stub, params);
-            }
-            if (func.equals("delete")) {
-                return delete(stub, params);
-            }
-            */
+
             if (func.equals("getUnit")) {
             	return getUnit(stub, params);
             }
@@ -84,57 +67,6 @@ public class SimpleChaincode extends ChaincodeBase {
         }
     }
 
-	/*
-    private Response invoke(ChaincodeStub stub, List<String> args) {
-        if (args.size() != 3) {
-            return newErrorResponse("Incorrect number of arguments. Expecting 3");
-        }
-        String accountFromKey = args.get(0);
-        String accountToKey = args.get(1);
-
-        String accountFromValueStr = stub.getStringState(accountFromKey);
-        if (accountFromValueStr == null) {
-            return newErrorResponse(String.format("Entity %s not found", accountFromKey));
-        }
-        int accountFromValue = Integer.parseInt(accountFromValueStr);
-
-        String accountToValueStr = stub.getStringState(accountToKey);
-        if (accountToValueStr == null) {
-            return newErrorResponse(String.format("Entity %s not found", accountToKey));
-        }
-        int accountToValue = Integer.parseInt(accountToValueStr);
-
-        int amount = Integer.parseInt(args.get(2));
-
-        if (amount > accountFromValue) {
-            return newErrorResponse(String.format("not enough money in account %s", accountFromKey));
-        }
-
-        accountFromValue -= amount;
-        accountToValue += amount;
-
-        _logger.info(String.format("new value of A: %s", accountFromValue));
-        _logger.info(String.format("new value of B: %s", accountToValue));
-
-        stub.putStringState(accountFromKey, Integer.toString(accountFromValue));
-        stub.putStringState(accountToKey, Integer.toString(accountToValue));
-
-        _logger.info("Transfer complete");
-
-        return newSuccessResponse("invoke finished successfully", ByteString.copyFrom(accountFromKey + ": " + accountFromValue + " " + accountToKey + ": " + accountToValue, UTF_8).toByteArray());
-    }
-
-    // Deletes an entity from state
-    private Response delete(ChaincodeStub stub, List<String> args) {
-        if (args.size() != 1) {
-            return newErrorResponse("Incorrect number of arguments. Expecting 1");
-        }
-        String key = args.get(0);
-        // Delete the key from the state in ledger
-        stub.delState(key);
-        return newSuccessResponse();
-    }
-	*/
     // query callback representing the query of a chaincode
     private Response query(ChaincodeStub stub, List<String> args) {
         if (args.size() != 1) {
@@ -152,20 +84,24 @@ public class SimpleChaincode extends ChaincodeBase {
 
 	// write callback representing the addition of a new sensor record to the blockchian
     private Response write(ChaincodeStub stub, List<String> params) {
-   		if(params.size() != 2) {
-   			return newErrorResponse("Invalid number of parameters. Expecting 2");
+   		if(params.size() != 3) {
+   			return newErrorResponse("Invalid number of parameters. Expecting 3");
    		}
+
+		// prepare a formatter for validating and storing the timestamp in the blockchain
+		DateTimeFormatter f = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
    		String itemTag = params.get(0);
    		int sensorValue = Integer.parseInt(params.get(1));
+		LocalDateTime timestamp = LocalDateTime.parse(params.get(2), f);
 
-   		_logger.info(String.format("Writing sensor value %s to item-tag %s", sensorValue, itemTag));
+   		_logger.info(String.format("Writing value/timestamp pair  %s to item-tag %s", sensorValue, itemTag));
 
 		if (itemTag.equals("unit")) {
 			return newErrorResponse(String.format("Reserved keyword \"%s\"", itemTag));
 		}
 
-   		stub.putStringState(itemTag, Integer.toString(sensorValue));
+   		stub.putStringState(itemTag, String.format("{\"value\": \"%s\", \"timestamp\": \"%s\"}", Integer.toString(sensorValue), timestamp.format(f)));
 
    		_logger.info("Write complete");
 

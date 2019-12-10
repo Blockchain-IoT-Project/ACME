@@ -107,11 +107,11 @@ if [ "${NO_CHAINCODE}" != "true" ]; then
 
 	# Query chaincode on peer0.org1
 	echo "Querying chaincode on peer0.org1..."
-	chaincodeQuery 0 1 4
+	chaincodeQuery 0 1 '{"value": "4", "timestamp": "1994-01-13 14:22:11"}'
 
 	# Now query on chaincode on peer1.org2
 	echo "Querying chaincode on peer1.org2..."
-	chaincodeQuery 1 2 4
+	chaincodeQuery 1 2 '{"value": "4", "timestamp": "1994-01-13 14:22:11"}'
 fi
 
 echo
