@@ -8,7 +8,7 @@ plugins {
     id 'java'
 }
 
-group 'org.hyperledger.fabric-chaincode-java'
+group 'org.ACME'
 version '1.0-SNAPSHOT'
 
 sourceCompatibility = 1.8
@@ -29,6 +29,6 @@ shadowJar {
     classifier = null
 
     manifest {
-        attributes 'Main-Class': 'org.hyperledger.fabric.example.SimpleChaincode'
+        attributes 'Main-Class': 'org.ACME.chaincode.ACMEChaincode'
     }
 }
