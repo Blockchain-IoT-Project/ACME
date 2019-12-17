@@ -8,3 +8,7 @@ This functionality is realized in the following methods:
 - `write [item id] [value] [timestamp]` writes a new sensor value and its timestamp (formatted in yyyy-MM-dd HH:mm:ss) onto the blockchain with the given item id as the key
 - `query [item id]` returns the sensor value and timestamp in a json formatted string
 - `getUnit` returns the sensor's unit of measurement
+
+## Todo
+
+Implement some sort of authorization with the help of the client identification library in order to restrict the sensor organization to only write and the others to only read data from the blockchain.
