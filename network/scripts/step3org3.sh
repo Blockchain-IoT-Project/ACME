@@ -22,17 +22,14 @@ TIMEOUT="$4"
 VERBOSE="$5"
 : ${CHANNEL_NAME:="mychannel"}
 : ${DELAY:="3"}
-: ${LANGUAGE:="golang"}
+: ${LANGUAGE:="java"}
 : ${TIMEOUT:="10"}
 : ${VERBOSE:="false"}
 LANGUAGE=`echo "$LANGUAGE" | tr [:upper:] [:lower:]`
 COUNTER=1
 MAX_RETRY=5
 
-CC_SRC_PATH="github.com/chaincode/chaincode_example02/go/"
-if [ "$LANGUAGE" = "node" ]; then
-	CC_SRC_PATH="/opt/gopath/src/github.com/chaincode/chaincode_example02/node/"
-fi
+CC_SRC_PATH="/opt/gopath/src/github.com/chaincode/"
 
 # import utils
 . scripts/utils.sh

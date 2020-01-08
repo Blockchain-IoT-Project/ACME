@@ -250,7 +250,7 @@ COMPOSE_FILE_KAFKA=docker-compose-kafka.yaml
 # two additional etcd/raft orderers
 COMPOSE_FILE_RAFT2=docker-compose-etcdraft2.yaml
 # use golang as the default language for chaincode
-LANGUAGE=golang
+LANGUAGE=java
 # default image tag
 IMAGETAG="latest"
 
