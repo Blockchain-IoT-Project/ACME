@@ -32,6 +32,9 @@ export PATH=${PWD}/../bin:${PWD}:$PATH
 export FABRIC_CFG_PATH=${PWD}
 export VERBOSE=false
 
+#defaulting the script to use certificate authorities
+export CERTIFICATE_AUTHORITIES=true
+
 # Print the usage message
 function printHelp() {
   echo "Usage: "
