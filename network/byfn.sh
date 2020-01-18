@@ -444,11 +444,11 @@ function generateChannelArtifacts() {
     exit 1
   fi
   echo
-  echo "#################################################################"
-  echo "### Generating channel configuration transaction 'channel.tx' ###"
-  echo "#################################################################"
+  echo "###############################################################################"
+  echo "### Generating channel configuration transaction 'channel_$CHANNEL_NAME.tx' ###"
+  echo "###############################################################################"
   set -x
-  configtxgen -profile TwoOrgsChannel -outputCreateChannelTx ./channel-artifacts/channel.tx -channelID $CHANNEL_NAME
+  configtxgen -profile TwoOrgsChannel -outputCreateChannelTx ./channel-artifacts/channel_$(echo $CHANNEL_NAME).tx -channelID $CHANNEL_NAME
   res=$?
   set +x
   if [ $res -ne 0 ]; then

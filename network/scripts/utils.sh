@@ -71,6 +71,7 @@ setGlobals() {
 updateAnchorPeers() {
   PEER=$1
   ORG=$2
+  CHANNEL_NAME=$3
   setGlobals $PEER $ORG
 
   if [ -z "$CORE_PEER_TLS_ENABLED" -o "$CORE_PEER_TLS_ENABLED" = "false" ]; then
@@ -95,6 +96,7 @@ updateAnchorPeers() {
 joinChannelWithRetry() {
   PEER=$1
   ORG=$2
+  CHANNEL_NAME=$3
   setGlobals $PEER $ORG
 
   set -x
@@ -131,6 +133,7 @@ installChaincode() {
 instantiateChaincode() {
   PEER=$1
   ORG=$2
+  CHANNEL_NAME=$3
   setGlobals $PEER $ORG
   VERSION=${3:-1.0}
 
@@ -157,6 +160,7 @@ instantiateChaincode() {
 upgradeChaincode() {
   PEER=$1
   ORG=$2
+  CHANNEL_NAME=$3
   setGlobals $PEER $ORG
 
   set -x
@@ -172,8 +176,9 @@ upgradeChaincode() {
 chaincodeQuery() {
   PEER=$1
   ORG=$2
+  CHANNEL_NAME=$3
   setGlobals $PEER $ORG
-  EXPECTED_RESULT=$3
+  EXPECTED_RESULT=$4
   echo "===================== Querying on peer${PEER}.org${ORG} on channel '$CHANNEL_NAME'... ===================== "
   local rc=1
   local starttime=$(date +%s)
@@ -270,10 +275,14 @@ createConfigUpdate() {
 # (e.g. invoke, query, instantiate) and checks for an even number of
 # peers and associated org, then sets $PEER_CONN_PARMS and $PEERS
 parsePeerConnectionParameters() {
-  # check for uneven number of peer and org parameters
-  if [ $(($# % 2)) -ne 0 ]; then
+  # check for uneven number of peer and org parameters + 1 for the channel name!
+  if [ $(($# % 2) + 1) -ne 0 ]; then
     exit 1
   fi
+
+  #get the channel name out of there first
+  CHANNEL_NAME=$1
+  shift
 
   PEER_CONN_PARMS=""
   PEERS=""
