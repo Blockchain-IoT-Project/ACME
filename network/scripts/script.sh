@@ -71,49 +71,84 @@ joinChannel () {
 	done
 }
 
-## Create channel 'mychannel'
-echo "Creating channel 'mychannel'..."
-createChannel 'mychannel'
+## Create channel 's1'
+echo "Creating channel 's1'..."
+createChannel 's1'
 
-## Join all the peers to the channel 'mychannel'
-echo "Having all peers join the channel 'mychannel'..."
-joinChannel 'mychannel'
+## Create channel 's2'
+echo "Creating channel 's2'..."
+createChannel 's2'
 
-## Set the anchor peers for each org in the channel
-echo "Updating anchor peers for org1..."
-updateAnchorPeers 0 1 'mychannel'
-echo "Updating anchor peers for org2..."
-updateAnchorPeers 0 2 'mychannel'
+
+
+## Join all the peers to the channel 's1'
+echo "Having all peers join the channel 's1'..."
+joinChannel 's1'
+
+## Set the anchor peers for each org in s1
+echo "Updating anchor peers for org1 in s1..."
+updateAnchorPeers 0 1 's1'
+echo "Updating anchor peers for org2 in s1..."
+updateAnchorPeers 0 2 's1'
+
+
+
+## Join all the peers to the channel 's2'
+echo "Having all peers join the channel 's2'..."
+joinChannel 's2'
+
+## Set the anchor peers for each org in s22
+echo "Updating anchor peers for org1 in s2..."
+updateAnchorPeers 0 1 's2'
+echo "Updating anchor peers for org2 in s2..."
+updateAnchorPeers 0 2 's2'
 
 if [ "${NO_CHAINCODE}" != "true" ]; then
 
-	## Install chaincode on peer0.org1 and peer0.org2
+	## Install chaincode on peer0.org1 and peer0.org2 for s1
 	echo "Installing chaincode on peer0.org1..."
-	installChaincode 0 1
+	installChaincode 0 1 's1'
 	echo "Install chaincode on peer0.org2..."
-	installChaincode 0 2
+	installChaincode 0 2 's1'
 
-	# Instantiate chaincode on peer0.org2 and peer0.org1
-	echo "Instantiating chaincode on peer0.org2..."
-	instantiateChaincode 0 2 'mychannel'
-	echo "Instantiating chaincode on peer0.org2..."
-	instantiateChaincode 0 1 'mychannel'
+	## Install chaincode on peer0.org1 and peer0.org2 for s2
+	echo "Installing chaincode on peer0.org1..."
+	installChaincode 0 1 's2'
+	echo "Install chaincode on peer0.org2..."
+	installChaincode 0 2 's2'
+	
+	# Instantiate chaincode on peer0.org2 and peer0.org1 in s1
+	echo "Instantiating chaincode on peer0.org2 in s1..."
+	instantiateChaincode 0 2 's1'
+	echo "Instantiating chaincode on peer0.org2 in s1..."
+	instantiateChaincode 0 1 's1'
+	
+    # Instantiate chaincode on peer0.org2 and peer0.org1 in s2
+	echo "Instantiating chaincode on peer0.org2 in s2..."
+	instantiateChaincode 0 2 's2'
+	echo "Instantiating chaincode on peer0.org2 in s2..."
+	instantiateChaincode 0 1 's2'
 
-	# Invoke chaincode on peer0.org1 and peer0.org2
-	echo "Sending invoke transaction on peer0.org1 peer0.org2..."
-	chaincodeInvoke 'mychannel' 0 1 0 2
+	# Invoke chaincode on peer0.org1 and peer0.org2 in s1
+	echo "Sending invoke transaction on peer0.org1 peer0.org2 in s1..."
+	chaincodeInvoke 's1' 0 1 0 2
+
+	# Invoke chaincode on peer0.org1 and peer0.org2 in s2
+	echo "Sending invoke transaction on peer0.org1 peer0.org2 in s2..."
+	chaincodeInvoke 's2' 0 1 0 2
+	
 
 	## Install chaincode on peer1.org2
 	echo "Installing chaincode on peer1.org2..."
-	installChaincode 1 2
+	installChaincode 1 2 's2'
 
-	# Query chaincode on peer0.org1
-	echo "Querying chaincode on peer0.org1..."
-	chaincodeQuery 0 1 'mychannel' '{"value": "4", "timestamp": "1994-01-13 14:22:11"}'
+	# Query chaincode on peer0.org1 in s2
+	echo "Querying chaincode on peer0.org1 in s1..."
+	chaincodeQuery 0 1 's2' '{"value": "4", "timestamp": "1994-01-13 14:22:11"}'
 
-	# Now query on chaincode on peer1.org2
-	echo "Querying chaincode on peer1.org2..."
-	chaincodeQuery 1 2 'mychannel' '{"value": "4", "timestamp": "1994-01-13 14:22:11"}'
+	# Now query on chaincode on peer1.org2 in s2
+	echo "Querying chaincode on peer1.org2 in s2..."
+	chaincodeQuery 1 2 's2' '{"value": "4", "timestamp": "1994-01-13 14:22:11"}'
 fi
 
 echo

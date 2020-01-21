@@ -76,12 +76,12 @@ updateAnchorPeers() {
 
   if [ -z "$CORE_PEER_TLS_ENABLED" -o "$CORE_PEER_TLS_ENABLED" = "false" ]; then
     set -x
-    peer channel update -o orderer.example.com:7050 -c $CHANNEL_NAME -f ./channel-artifacts/${CORE_PEER_LOCALMSPID}anchors.tx >&log.txt
+    peer channel update -o orderer.example.com:7050 -c $CHANNEL_NAME -f ./channel-artifacts/${CORE_PEER_LOCALMSPID}anchors_${CHANNEL_NAME}.tx >&log.txt
     res=$?
     set +x
   else
     set -x
-    peer channel update -o orderer.example.com:7050 -c $CHANNEL_NAME -f ./channel-artifacts/${CORE_PEER_LOCALMSPID}anchors.tx --tls $CORE_PEER_TLS_ENABLED --cafile $ORDERER_CA >&log.txt
+    peer channel update -o orderer.example.com:7050 -c $CHANNEL_NAME -f ./channel-artifacts/${CORE_PEER_LOCALMSPID}anchors_${CHANNEL_NAME}.tx --tls $CORE_PEER_TLS_ENABLED --cafile $ORDERER_CA >&log.txt
     res=$?
     set +x
   fi
@@ -118,10 +118,12 @@ joinChannelWithRetry() {
 installChaincode() {
   PEER=$1
   ORG=$2
+  CHANNEL_NAME=$3 #not needed here, but chaincode gets installed with the channel name it'll be instantiated in
   setGlobals $PEER $ORG
-  VERSION=${3:-1.0}
+  ## VERSION=${3:-1.0} no
+  VERSION=1.0
   set -x
-  peer chaincode install -n acme_cc -v ${VERSION} -l ${LANGUAGE} -p ${CC_SRC_PATH} >&log.txt
+  peer chaincode install -n acme_cc_$CHANNEL_NAME -v ${VERSION} -l ${LANGUAGE} -p ${CC_SRC_PATH} >&log.txt
   res=$?
   set +x
   cat log.txt
@@ -135,19 +137,20 @@ instantiateChaincode() {
   ORG=$2
   CHANNEL_NAME=$3
   setGlobals $PEER $ORG
-  VERSION=${3:-1.0}
+  # VERSION=${3:-1.0} no
+  VERSION=1.0
 
   # while 'peer chaincode' command can get the orderer endpoint from the peer
   # (if join was successful), let's supply it directly as we know it using
   # the "-o" option
   if [ -z "$CORE_PEER_TLS_ENABLED" -o "$CORE_PEER_TLS_ENABLED" = "false" ]; then
     set -x
-    peer chaincode instantiate -o orderer.example.com:7050 -C $CHANNEL_NAME -n acme_cc -l ${LANGUAGE} -v ${VERSION} -c '{"Args":["init", "C"]}' -P "AND ('Org1MSP.peer','Org2MSP.peer')" >&log.txt
+    peer chaincode instantiate -o orderer.example.com:7050 -C $CHANNEL_NAME -n acme_cc_$CHANNEL_NAME -l ${LANGUAGE} -v ${VERSION} -c '{"Args":["init", "C"]}' -P "AND ('Org1MSP.peer','Org2MSP.peer')" >&log.txt
     res=$?
     set +x
   else
     set -x
-    peer chaincode instantiate -o orderer.example.com:7050 --tls $CORE_PEER_TLS_ENABLED --cafile $ORDERER_CA -C $CHANNEL_NAME -n acme_cc -l ${LANGUAGE} -v 1.0 -c '{"Args":["init", "C"]}' -P "AND ('Org1MSP.peer','Org2MSP.peer')" >&log.txt
+    peer chaincode instantiate -o orderer.example.com:7050 --tls $CORE_PEER_TLS_ENABLED --cafile $ORDERER_CA -C $CHANNEL_NAME -n acme_cc_$CHANNEL_NAME -l ${LANGUAGE} -v 1.0 -c '{"Args":["init", "C"]}' -P "AND ('Org1MSP.peer','Org2MSP.peer')" >&log.txt
     res=$?
     set +x
   fi
@@ -164,7 +167,7 @@ upgradeChaincode() {
   setGlobals $PEER $ORG
 
   set -x
-  peer chaincode upgrade -o orderer.example.com:7050 --tls $CORE_PEER_TLS_ENABLED --cafile $ORDERER_CA -C $CHANNEL_NAME -n acme_cc -v 2.0 -c '{"Args":["init", "C"]}' -P "AND ('Org1MSP.peer','Org2MSP.peer','Org3MSP.peer')"
+  peer chaincode upgrade -o orderer.example.com:7050 --tls $CORE_PEER_TLS_ENABLED --cafile $ORDERER_CA -C $CHANNEL_NAME -n acme_cc_$CHANNEL_NAME -v 2.0 -c '{"Args":["init", "C"]}' -P "AND ('Org1MSP.peer','Org2MSP.peer','Org3MSP.peer')"
   res=$?
   set +x
   cat log.txt
@@ -191,7 +194,7 @@ chaincodeQuery() {
     sleep $DELAY
     echo "Attempting to Query peer${PEER}.org${ORG} ...$(($(date +%s) - starttime)) secs"
     set -x
-    peer chaincode query -C $CHANNEL_NAME -n acme_cc -c '{"Args":["query","a"]}' >&log.txt
+    peer chaincode query -C $CHANNEL_NAME -n acme_cc_$CHANNEL_NAME -c '{"Args":["query","a"]}' >&log.txt
     res=$?
     set +x
 
@@ -275,14 +278,14 @@ createConfigUpdate() {
 # (e.g. invoke, query, instantiate) and checks for an even number of
 # peers and associated org, then sets $PEER_CONN_PARMS and $PEERS
 parsePeerConnectionParameters() {
-  # check for uneven number of peer and org parameters + 1 for the channel name!
-  if [ $(($# % 2) + 1) -ne 0 ]; then
-    exit 1
-  fi
-
   #get the channel name out of there first
   CHANNEL_NAME=$1
   shift
+  
+  # now check for uneven number of peer and org parameters
+  if [ $(($# % 2)) -ne 0 ]; then
+    exit 1
+  fi
 
   PEER_CONN_PARMS=""
   PEERS=""
@@ -315,12 +318,12 @@ chaincodeInvoke() {
   # it using the "-o" option
   if [ -z "$CORE_PEER_TLS_ENABLED" -o "$CORE_PEER_TLS_ENABLED" = "false" ]; then
     set -x
-    peer chaincode invoke -o orderer.example.com:7050 -C $CHANNEL_NAME -n acme_cc $PEER_CONN_PARMS -c '{"Args":["write", "a", "4", "1994-01-13 14:22:11"]}' >&log.txt
+    peer chaincode invoke -o orderer.example.com:7050 -C $CHANNEL_NAME -n acme_cc_$CHANNEL_NAME $PEER_CONN_PARMS -c '{"Args":["write", "a", "4", "1994-01-13 14:22:11"]}' >&log.txt
     res=$?
     set +x
   else
     set -x
-    peer chaincode invoke -o orderer.example.com:7050 --tls $CORE_PEER_TLS_ENABLED --cafile $ORDERER_CA -C $CHANNEL_NAME -n acme_cc $PEER_CONN_PARMS -c '{"Args":["write", "a", "4", "1994-01-13 14:22:11"]}' >&log.txt
+    peer chaincode invoke -o orderer.example.com:7050 --tls $CORE_PEER_TLS_ENABLED --cafile $ORDERER_CA -C $CHANNEL_NAME -n acme_cc_$CHANNEL_NAME $PEER_CONN_PARMS -c '{"Args":["write", "a", "4", "1994-01-13 14:22:11"]}' >&log.txt
     res=$?
     set +x
   fi

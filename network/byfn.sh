@@ -443,12 +443,26 @@ function generateChannelArtifacts() {
     echo "Failed to generate orderer genesis block..."
     exit 1
   fi
+
   echo
   echo "###############################################################################"
-  echo "### Generating channel configuration transaction 'channel_$CHANNEL_NAME.tx' ###"
+  echo "### Generating channel configuration transaction 'channel_s1.tx' ###"
   echo "###############################################################################"
   set -x
-  configtxgen -profile TwoOrgsChannel -outputCreateChannelTx ./channel-artifacts/channel_$(echo $CHANNEL_NAME).tx -channelID $CHANNEL_NAME
+  configtxgen -profile TwoOrgsChannel -outputCreateChannelTx ./channel-artifacts/channel_s1.tx -channelID s1
+  res=$?
+  set +x
+  if [ $res -ne 0 ]; then
+    echo "Failed to generate channel configuration transaction..."
+    exit 1
+  fi
+
+  echo
+  echo "###############################################################################"
+  echo "### Generating channel configuration transaction 'channel_s2.tx' ###"
+  echo "###############################################################################"
+  set -x
+  configtxgen -profile TwoOrgsChannel -outputCreateChannelTx ./channel-artifacts/channel_s2.tx -channelID s2
   res=$?
   set +x
   if [ $res -ne 0 ]; then
@@ -458,10 +472,10 @@ function generateChannelArtifacts() {
 
   echo
   echo "#################################################################"
-  echo "#######    Generating anchor peer update for Org1MSP   ##########"
+  echo "#####    Generating anchor peer update for Org1MSP (s1)  ########"
   echo "#################################################################"
   set -x
-  configtxgen -profile TwoOrgsChannel -outputAnchorPeersUpdate ./channel-artifacts/Org1MSPanchors.tx -channelID $CHANNEL_NAME -asOrg Org1MSP
+  configtxgen -profile TwoOrgsChannel -outputAnchorPeersUpdate ./channel-artifacts/Org1MSPanchors_s1.tx -channelID s1 -asOrg Org1MSP
   res=$?
   set +x
   if [ $res -ne 0 ]; then
@@ -471,17 +485,43 @@ function generateChannelArtifacts() {
 
   echo
   echo "#################################################################"
-  echo "#######    Generating anchor peer update for Org2MSP   ##########"
+  echo "#####    Generating anchor peer update for Org1MSP (s2)  ########"
   echo "#################################################################"
   set -x
-  configtxgen -profile TwoOrgsChannel -outputAnchorPeersUpdate \
-    ./channel-artifacts/Org2MSPanchors.tx -channelID $CHANNEL_NAME -asOrg Org2MSP
+  configtxgen -profile TwoOrgsChannel -outputAnchorPeersUpdate ./channel-artifacts/Org1MSPanchors_s2.tx -channelID s2 -asOrg Org1MSP
+  res=$?
+  set +x
+  if [ $res -ne 0 ]; then
+    echo "Failed to generate anchor peer update for Org1MSP..."
+    exit 1
+  fi
+
+  echo
+  echo "#################################################################"
+  echo "#####    Generating anchor peer update for Org2MSP (s1)  ########"
+  echo "#################################################################"
+  set -x
+  configtxgen -profile TwoOrgsChannel -outputAnchorPeersUpdate ./channel-artifacts/Org2MSPanchors_s1.tx -channelID s1 -asOrg Org2MSP
   res=$?
   set +x
   if [ $res -ne 0 ]; then
     echo "Failed to generate anchor peer update for Org2MSP..."
     exit 1
   fi
+
+  echo
+  echo "#################################################################"
+  echo "#####    Generating anchor peer update for Org2MSP (s2)  ########"
+  echo "#################################################################"
+  set -x
+  configtxgen -profile TwoOrgsChannel -outputAnchorPeersUpdate ./channel-artifacts/Org2MSPanchors_s2.tx -channelID s2 -asOrg Org2MSP
+  res=$?
+  set +x
+  if [ $res -ne 0 ]; then
+    echo "Failed to generate anchor peer update for Org2MSP..."
+    exit 1
+  fi
+    
   echo
 }
 
@@ -580,17 +620,6 @@ while getopts "h?c:t:d:f:s:l:i:o:anv" opt; do
   esac
 done
 
-
-# Announce what was requested
-
-if [ "${IF_COUCHDB}" == "couchdb" ]; then
-  echo
-  echo "${EXPMODE} for channel '${CHANNEL_NAME}' with CLI timeout of '${CLI_TIMEOUT}' seconds and CLI delay of '${CLI_DELAY}' seconds and using database '${IF_COUCHDB}'"
-else
-  echo "${EXPMODE} for channel '${CHANNEL_NAME}' with CLI timeout of '${CLI_TIMEOUT}' seconds and CLI delay of '${CLI_DELAY}' seconds"
-fi
-# ask for confirmation to proceed
-askProceed
 
 #Create the network using docker compose
 if [ "${MODE}" == "up" ]; then
