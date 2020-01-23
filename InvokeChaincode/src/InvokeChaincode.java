@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.Properties;
 
 import Config.Config;
 import User.UserContext;
@@ -27,9 +28,9 @@ public class InvokeChaincode {
 		try {
             Util.cleanUp();
 			String caUrl = Config.CA_ORG1_URL;
-			CAClient caClient = new CAClient(caUrl, null);
+			CAClient caClient = new CAClient(caUrl, new Properties());
 
-			/*
+			
 			// Enroll Admin to Org1MSP
 			UserContext adminUserContext = new UserContext();
 			adminUserContext.setName(Config.ADMIN);
@@ -41,6 +42,7 @@ public class InvokeChaincode {
 			//Setup Fabric Client
 			FabricClient fabClient = new FabricClient(adminUserContext);
 
+			/*
 			//Initialize Channel with Peer, EventHub and Orderer
 			ChannelClient channelClient = fabClient.createChannelClient(Config.CHANNEL_NAME);
 			Channel channel = channelClient.getChannel();
@@ -51,13 +53,16 @@ public class InvokeChaincode {
 			channel.addEventHub(eventHub);
 			channel.addOrderer(orderer);
 			channel.initialize();
+			*/
+			ChannelClient channelClient = fabClient.createChannelClient(Config.CHANNEL_NAME);
 
+			
 			//Setup request
 			TransactionProposalRequest request = fabClient.getInstance().newTransactionProposalRequest();
 			ChaincodeID ccid = ChaincodeID.newBuilder().setName(Config.CHAINCODE_1_NAME).build();
 			request.setChaincodeID(ccid);
-			request.setFcn("createCar");
-			String[] arguments = { "CAR1", "Chevy", "Volt", "Red", "Nick" };
+			request.setFcn("write");
+			String[] arguments = { "tag1", "4", "2019-01-01 14:22:11" };
 			request.setArgs(arguments);
 			request.setProposalWaitTime(1000);
 
@@ -77,8 +82,8 @@ public class InvokeChaincode {
 				Logger.getLogger(InvokeChaincode.class.getName()).log(Level.INFO,"Invoked createCar on "+Config.CHAINCODE_1_NAME + ". Status - " + status);
 			}
 
-			*/
-
+			
+			/*
 			//Enroll User to Org1MSP
 			UserContext newUserContext = new UserContext();
 			newUserContext.setName("user");
@@ -126,7 +131,7 @@ public class InvokeChaincode {
 			for (ProposalResponse res: responses) {
 				Status status = res.getStatus();
 				Logger.getLogger(InvokeChaincode.class.getName()).log(Level.INFO,"Invoked createCar on "+Config.CHAINCODE_1_NAME + ". Status - " + status);
-			}
+			} */
 
 		} catch (Exception e) {
 			e.printStackTrace();
