@@ -22,10 +22,10 @@ services:
       - FABRIC_CA_SERVER_CA_NAME=ca-org1
       - FABRIC_CA_SERVER_TLS_ENABLED=false
       - FABRIC_CA_SERVER_TLS_CERTFILE=/etc/hyperledger/fabric-ca-server-config/ca.org1.acme.org-cert.pem
-      - FABRIC_CA_SERVER_TLS_KEYFILE=/etc/hyperledger/fabric-ca-server-config/CA1_PRIVATE_KEY
+      - FABRIC_CA_SERVER_TLS_KEYFILE=/etc/hyperledger/fabric-ca-server-config/12ef5d1bd8dc0fa4be56a0cb7facae23e015d2e69a078214568acd03d1d3be46_sk
     ports:
       - "7054:7054"
-    command: sh -c 'fabric-ca-server start --ca.certfile /etc/hyperledger/fabric-ca-server-config/ca.org1.acme.org-cert.pem --ca.keyfile /etc/hyperledger/fabric-ca-server-config/CA1_PRIVATE_KEY -b admin:adminpw -d'
+    command: sh -c 'fabric-ca-server start --ca.certfile /etc/hyperledger/fabric-ca-server-config/ca.org1.acme.org-cert.pem --ca.keyfile /etc/hyperledger/fabric-ca-server-config/12ef5d1bd8dc0fa4be56a0cb7facae23e015d2e69a078214568acd03d1d3be46_sk -b admin:adminpw -d'
     volumes:
       - ./crypto-config/peerOrganizations/org1.acme.org/ca/:/etc/hyperledger/fabric-ca-server-config
     container_name: ca_peerOrg1
@@ -39,10 +39,10 @@ services:
       - FABRIC_CA_SERVER_CA_NAME=ca-org2
       - FABRIC_CA_SERVER_TLS_ENABLED=false
       - FABRIC_CA_SERVER_TLS_CERTFILE=/etc/hyperledger/fabric-ca-server-config/ca.org2.acme.org-cert.pem
-      - FABRIC_CA_SERVER_TLS_KEYFILE=/etc/hyperledger/fabric-ca-server-config/CA2_PRIVATE_KEY
+      - FABRIC_CA_SERVER_TLS_KEYFILE=/etc/hyperledger/fabric-ca-server-config/0e9fe87ac6e851d922f0586aa337c6f548830fd602a376643442fa1650f9075f_sk
     ports:
       - "8054:7054"
-    command: sh -c 'fabric-ca-server start --ca.certfile /etc/hyperledger/fabric-ca-server-config/ca.org2.acme.org-cert.pem --ca.keyfile /etc/hyperledger/fabric-ca-server-config/CA2_PRIVATE_KEY -b admin:adminpw -d'
+    command: sh -c 'fabric-ca-server start --ca.certfile /etc/hyperledger/fabric-ca-server-config/ca.org2.acme.org-cert.pem --ca.keyfile /etc/hyperledger/fabric-ca-server-config/0e9fe87ac6e851d922f0586aa337c6f548830fd602a376643442fa1650f9075f_sk -b admin:adminpw -d'
     volumes:
       - ./crypto-config/peerOrganizations/org2.acme.org/ca/:/etc/hyperledger/fabric-ca-server-config
     container_name: ca_peerOrg2
