@@ -1,11 +1,13 @@
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 import java.util.Collection;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.Properties;
+import java.util.concurrent.CompletableFuture;
 
 import Config.Config;
 import User.UserContext;
@@ -18,6 +20,7 @@ import org.hyperledger.fabric.sdk.Orderer;
 import org.hyperledger.fabric.sdk.Peer;
 import org.hyperledger.fabric.sdk.ProposalResponse;
 import org.hyperledger.fabric.sdk.TransactionProposalRequest;
+import org.hyperledger.fabric.sdk.BlockEvent;
 
 public class InvokeChaincode {
 
@@ -42,19 +45,21 @@ public class InvokeChaincode {
 			//Setup Fabric Client
 			FabricClient fabClient = new FabricClient(adminUserContext);
 
-			/*
+			
 			//Initialize Channel with Peer, EventHub and Orderer
 			ChannelClient channelClient = fabClient.createChannelClient(Config.CHANNEL_NAME);
 			Channel channel = channelClient.getChannel();
-			Peer peer = fabClient.getInstance().newPeer(Config.ORG1_PEER_0, Config.ORG1_PEER_0_URL);
-			EventHub eventHub = fabClient.getInstance().newEventHub("eventhub01", "grpc://localhost:7053");
+			Peer peer0org1 = fabClient.getInstance().newPeer(Config.ORG1_PEER_0, Config.ORG1_PEER_0_URL);
+			Peer peer0org2 = fabClient.getInstance().newPeer(Config.ORG2_PEER_0, Config.ORG2_PEER_0_URL);
+			//EventHub eventHub = fabClient.getInstance().newEventHub("eventhub01", "grpc://localhost:7053");
 			Orderer orderer = fabClient.getInstance().newOrderer(Config.ORDERER_NAME, Config.ORDERER_URL);
-			channel.addPeer(peer);
-			channel.addEventHub(eventHub);
+			channel.addPeer(peer0org1);
+			channel.addPeer(peer0org2);
+			//channel.addEventHub(eventHub);
 			channel.addOrderer(orderer);
 			channel.initialize();
-			*/
-			ChannelClient channelClient = fabClient.createChannelClient(Config.CHANNEL_NAME);
+			
+			//ChannelClient channelClient = fabClient.createChannelClient(Config.CHANNEL_NAME);
 
 			
 			//Setup request
@@ -76,12 +81,32 @@ public class InvokeChaincode {
 			request.setTransientMap(tm2);
 
 			//Send request
-			Collection<ProposalResponse> responses = channelClient.sendTransactionProposal(request);
+			Collection<ProposalResponse> responses = channel.sendTransactionProposal(request, channel.getPeers());
 			for (ProposalResponse res: responses) {
 				Status status = res.getStatus();
-				Logger.getLogger(InvokeChaincode.class.getName()).log(Level.INFO,"Invoked createCar on "+Config.CHAINCODE_1_NAME + ". Status - " + status);
+				Logger.getLogger(InvokeChaincode.class.getName()).log(Level.INFO,"Invoked write on " + Config.CHAINCODE_1_NAME + ". Status - " + status);
 			}
 
+
+			// split all the responses up into failed and successful ones
+			Collection<ProposalResponse> successful = new ArrayList<>();
+			Collection<ProposalResponse> failed = new ArrayList<>();
+
+			for (ProposalResponse response : responses) {
+				if (response.getStatus() == ProposalResponse.Status.SUCCESS) {
+					successful.add(response);
+				} else {
+					failed.add(response);
+				}
+			}
+
+			/*
+			if (failed.size() > 0) {
+				Logger.getLogger(InvokeChaincode.class.getName()).log(Level.SEVERE, "Received failed response(s)");
+			} */
+
+			//submit it
+			CompletableFuture<BlockEvent.TransactionEvent> transactionEventCompleteableFuture = channel.sendTransaction(successful);
 			
 			/*
 			//Enroll User to Org1MSP

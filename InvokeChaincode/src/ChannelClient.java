@@ -103,6 +103,7 @@ public class ChannelClient {
 
 		Collection<ProposalResponse> response = channel.sendTransactionProposal(request, channel.getPeers());
 		for (ProposalResponse pres : response) {
+			Logger.getLogger(ChannelClient.class.getName()).log(Level.INFO, "Attempting to process proposal response " + pres.getMessage());
 			String stringResponse = new String(pres.getChaincodeActionResponsePayload());
 			Logger.getLogger(ChannelClient.class.getName()).log(Level.INFO,
 					"Transaction proposal on channel " + channel.getName() + " " + pres.getMessage() + " "
