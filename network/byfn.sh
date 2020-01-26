@@ -200,6 +200,14 @@ function networkUp() {
     echo "ERROR !!!! Test failed"
     exit 1
   fi
+
+  # continue to add Org3
+  echo
+  echo "##########################################################"
+  echo "####### Proceeding to add Org3 to the network ###########"
+  echo "##########################################################"
+  . ./eyfn.sh generate
+  . ./eyfn.sh up 
 }
 
 # Upgrade the network components which are at version 1.3.x to 1.4.x
