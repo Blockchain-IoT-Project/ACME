@@ -121,7 +121,7 @@ installChaincode() {
   CHANNEL_NAME=$3 #not needed here, but chaincode gets installed with the channel name it'll be instantiated in
   setGlobals $PEER $ORG
   ## VERSION=${3:-1.0} no
-  VERSION=1.0
+  VERSION=$4
   set -x
   peer chaincode install -n acme_cc_$CHANNEL_NAME -v ${VERSION} -l ${LANGUAGE} -p ${CC_SRC_PATH} >&log.txt
   res=$?
@@ -167,7 +167,7 @@ upgradeChaincode() {
   setGlobals $PEER $ORG
 
   set -x
-  peer chaincode upgrade -o orderer.acme.org:7050 --tls $CORE_PEER_TLS_ENABLED --cafile $ORDERER_CA -C $CHANNEL_NAME -n acme_cc_$CHANNEL_NAME -v 2.0 -c '{"Args":["init", "C"]}' -P "AND ('Org1MSP.peer','Org2MSP.peer','Org3MSP.peer')"
+  peer chaincode upgrade -o orderer.acme.org:7050  -C $CHANNEL_NAME -n acme_cc_$CHANNEL_NAME -v 2.0 -c '{"Args":["init", "C"]}' -P "AND ('Org1MSP.peer','Org2MSP.peer','Org3MSP.peer')"  # --tls $CORE_PEER_TLS_ENABLED --cafile $ORDERER_CA
   res=$?
   set +x
   cat log.txt

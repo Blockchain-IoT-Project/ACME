@@ -35,18 +35,18 @@ CC_SRC_PATH="/opt/gopath/src/github.com/chaincode/"
 
 echo "Fetching channel config block from orderer..."
 set -x
-peer channel fetch 0 $CHANNEL_NAME.block -o orderer.acme.org:7050 -c $CHANNEL_NAME --tls --cafile $ORDERER_CA >&log.txt
+peer channel fetch 0 $CHANNEL_NAME.block -o orderer.acme.org:7050 -c $CHANNEL_NAME >&log.txt #  --tls --cafile $ORDERER_CA
 res=$?
 set +x
 cat log.txt
 verifyResult $res "Fetching config block from orderer has Failed"
 
-joinChannelWithRetry 0 3
+joinChannelWithRetry 0 3 $CHANNEL_NAME
 echo "===================== peer0.org3 joined channel '$CHANNEL_NAME' ===================== "
-joinChannelWithRetry 1 3
+joinChannelWithRetry 1 3 $CHANNEL_NAME
 echo "===================== peer1.org3 joined channel '$CHANNEL_NAME' ===================== "
 echo "Installing chaincode 2.0 on peer0.org3..."
-installChaincode 0 3 2.0
+installChaincode 0 3 $CHANNEL_NAME 2.0
 
 echo
 echo "========= Org3 is now halfway onto your first network ========= "

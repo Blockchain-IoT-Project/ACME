@@ -20,7 +20,7 @@ DELAY="$2"
 LANGUAGE="$3"
 TIMEOUT="$4"
 VERBOSE="$5"
-: ${CHANNEL_NAME:="mychannel"}
+: ${CHANNEL_NAME:="s2"}
 : ${DELAY:="3"}
 : ${LANGUAGE:="java"}
 : ${TIMEOUT:="10"}
@@ -35,12 +35,12 @@ CC_SRC_PATH="/opt/gopath/src/github.com/chaincode/"
 . scripts/utils.sh
 
 echo "===================== Installing chaincode 2.0 on peer0.org1 ===================== "
-installChaincode 0 1 2.0
+installChaincode 0 1 $CHANNEL_NAME 2.0
 echo "===================== Installing chaincode 2.0 on peer0.org2 ===================== "
-installChaincode 0 2 2.0
+installChaincode 0 2 $CHANNEL_NAME 2.0
 
 echo "===================== Upgrading chaincode on peer0.org1 ===================== "
-upgradeChaincode 0 1 'mychannel'
+upgradeChaincode 0 1 $CHANNEL_NAME 2.0
 
 echo
 echo "========= Finished adding Org3 to your first network! ========= "
