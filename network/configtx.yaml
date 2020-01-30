@@ -324,6 +324,10 @@ Profiles:
                 Organizations:
                     - *Org1
                     - *Org2
+            OneOrgConsortium:
+                Organizations:
+                    - *Org1
+
     TwoOrgsChannel:
         Consortium: SampleConsortium
         <<: *ChannelDefaults
@@ -334,6 +338,17 @@ Profiles:
                 - *Org2
             Capabilities:
                 <<: *ApplicationCapabilities
+
+    OneOrgChannel:
+        Consortium: OneOrgConsortium
+        <<: *ChannelDefaults
+        Application:
+            <<: *ApplicationDefaults
+            Organizations:
+                - *Org1
+            Capabilities:
+                <<: *ApplicationCapabilities
+
 
     SampleDevModeKafka:
         <<: *ChannelDefaults
