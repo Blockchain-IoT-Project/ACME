@@ -11,8 +11,10 @@ import com.google.protobuf.ByteString;
 import io.netty.handler.ssl.OpenSsl;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.json.JSONException;
 import org.hyperledger.fabric.shim.ChaincodeBase;
 import org.hyperledger.fabric.shim.ChaincodeStub;
+import org.hyperledger.fabric.contract.ClientIdentity;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
@@ -48,7 +50,7 @@ public class ACMEChaincode extends ChaincodeBase {
     @Override
     public Response invoke(ChaincodeStub stub) {
         try {
-            _logger.info("Invoke java sensor chaincode");
+            _logger.info("Invoke java sensor chaincode by peer");
             String func = stub.getFunction();
             List<String> params = stub.getParameters();
 
@@ -86,6 +88,16 @@ public class ACMEChaincode extends ChaincodeBase {
     private Response write(ChaincodeStub stub, List<String> params) {
    		if(params.size() != 3) {
    			return newErrorResponse("Invalid number of parameters. Expecting 3");
+   		}
+
+		try {
+			// check if the client belongs to Org1
+			ClientIdentity identity = new ClientIdentity(stub);
+	   		if(!identity.getMSPID().equals("Org1MSP")) {
+	   			return newErrorResponse("Only Org1MSP is allowed to write new values to the blockchain.");
+	   		}
+   		} catch (Exception e) {
+   			newErrorResponse("Could not determine client MSPID");
    		}
 
 		// prepare a formatter for validating and storing the timestamp in the blockchain
