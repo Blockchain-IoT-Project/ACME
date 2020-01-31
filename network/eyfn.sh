@@ -82,7 +82,7 @@ function clearContainers () {
 # specifically the following images are often left behind:
 # TODO list generated image naming patterns
 function removeUnwantedImages() {
-  DOCKER_IMAGE_IDS=$(docker images|awk '($1 ~ /dev-peer.*.mycc.*/) {print $3}')
+  DOCKER_IMAGE_IDS=$(docker images|awk '($1 ~ /dev-peer.*acme_cc*/) {print $3}')
   if [ -z "$DOCKER_IMAGE_IDS" -o "$DOCKER_IMAGE_IDS" == " " ]; then
     echo "---- No images available for deletion ----"
   else
@@ -236,6 +236,7 @@ CLI_TIMEOUT=10
 #default for delay
 CLI_DELAY=3
 # channel name defaults to "mychannel"
+# not used anymore
 CHANNEL_NAME="s2"
 # use this as the default docker-compose yaml definition
 COMPOSE_FILE=docker-compose-cli.yaml
