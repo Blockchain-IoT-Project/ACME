@@ -91,10 +91,10 @@ public class ACMEChaincode extends ChaincodeBase {
    		}
 
 		try {
-			// check if the client belongs to Org1
+			// check if the client belongs to Org1 (or OrdererMSP as this is what the cli executes the byfn.sh script in)
 			ClientIdentity identity = new ClientIdentity(stub);
-	   		if(!identity.getMSPID().equals("Org1MSP")) {
-	   			return newErrorResponse("Only Org1MSP is allowed to write new values to the blockchain.");
+	   		if(!("Org1MSP".equals(identity.getMSPID()))) {
+	   			return newErrorResponse("Only Org1MSP is allowed to write new values to the blockchain, " + identity.getMSPID() + " is not.");
 	   		}
    		} catch (Exception e) {
    			newErrorResponse("Could not determine client MSPID");

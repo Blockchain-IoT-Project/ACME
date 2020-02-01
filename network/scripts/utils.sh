@@ -150,7 +150,7 @@ instantiateChaincode() {
     set +x
   else
     set -x
-    peer chaincode instantiate -o orderer.acme.org:7050 --tls $CORE_PEER_TLS_ENABLED --cafile $ORDERER_CA -C $CHANNEL_NAME -n acme_cc_$CHANNEL_NAME -l ${LANGUAGE} -v 1.0 -c '{"Args":["init", "C"]}' -P "AND ('Org1MSP.peer','Org2MSP.peer')" >&log.txt
+    peer chaincode instantiate -o orderer.acme.org:7050 --tls $CORE_PEER_TLS_ENABLED --cafile $ORDERER_CA -C $ -n acme_cc_$CHANNEL_NAME -l ${LANGUAGE} -v 1.0 -c '{"Args":["init", "C"]}' -P "AND ('Org1MSP.peer','Org2MSP.peer')" >&log.txt
     res=$?
     set +x
   fi
@@ -278,11 +278,7 @@ createConfigUpdate() {
 # (e.g. invoke, query, instantiate) and checks for an even number of
 # peers and associated org, then sets $PEER_CONN_PARMS and $PEERS
 parsePeerConnectionParameters() {
-  #get the channel name out of there first
-  CHANNEL_NAME=$1
-  shift
-  
-  # now check for uneven number of peer and org parameters
+  # check for uneven number of peer and org parameters
   if [ $(($# % 2)) -ne 0 ]; then
     exit 1
   fi
@@ -306,24 +302,41 @@ parsePeerConnectionParameters() {
   PEERS="$(echo -e "$PEERS" | sed -e 's/^[[:space:]]*//')"
 }
 
-# chaincodeInvoke <peer> <org> ...
+# chaincodeInvoke <channel name> <invoke command> <peer> <org> ...
 # Accepts as many peer/org pairs as desired and requests endorsement from each
 chaincodeInvoke() {
+  #get the channel name out of there first
+  CHANNEL_NAME="$1" 
+  shift
+
+  # then extract the value to write
+  WRITE_VALUE="$1"
+  shift
+
+  # "back up" the current globals for the calling identity / needed because parsePeerConnectionParameters changes those values for easier generation of others
+  BACKUP_MSPID=$CORE_PEER_LOCALMSPID
+  BACKUP_MSP_PATH=$CORE_PEER_MSPCONFIGPATH
+  
+  # now parse the connection parameters for the peers  
   parsePeerConnectionParameters $@
   res=$?
   verifyResult $res "Invoke transaction failed on channel '$CHANNEL_NAME' due to uneven number of peer and org parameters "
+
+  # restore the identity from before
+  CORE_PEER_LOCALMSPID=$BACKUP_MSPID
+  CORE_PEER_MSPCONFIGPATH=$BACKUP_MSP_PATH
 
   # while 'peer chaincode' command can get the orderer endpoint from the
   # peer (if join was successful), let's supply it directly as we know
   # it using the "-o" option
   if [ -z "$CORE_PEER_TLS_ENABLED" -o "$CORE_PEER_TLS_ENABLED" = "false" ]; then
     set -x
-    peer chaincode invoke -o orderer.acme.org:7050 -C $CHANNEL_NAME -n acme_cc_$CHANNEL_NAME $PEER_CONN_PARMS -c '{"Args":["write", "a", "4", "1994-01-13 14:22:11"]}' >&log.txt
+    peer chaincode invoke -o orderer.acme.org:7050 -C $CHANNEL_NAME -n acme_cc_$CHANNEL_NAME $PEER_CONN_PARMS -c "$(printf "$WRITE_VALUE")" >&log.txt
     res=$?
     set +x
   else
     set -x
-    peer chaincode invoke -o orderer.acme.org:7050 --tls $CORE_PEER_TLS_ENABLED --cafile $ORDERER_CA -C $CHANNEL_NAME -n acme_cc_$CHANNEL_NAME $PEER_CONN_PARMS -c '{"Args":["write", "a", "4", "1994-01-13 14:22:11"]}' >&log.txt
+    peer chaincode invoke -o orderer.acme.org:7050 --tls $CORE_PEER_TLS_ENABLED --cafile $ORDERER_CA -C $CHANNEL_NAME -n acme_cc_$CHANNEL_NAME $PEER_CONN_PARMS -c $(printf "'$WRITE_VALUE'") >&log.txt
     res=$?
     set +x
   fi
