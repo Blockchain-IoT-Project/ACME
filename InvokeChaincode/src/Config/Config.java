@@ -53,7 +53,7 @@ public class Config {
 	
     public static final String ORG2_PEER_0 = "peer0.org2.acme.org";
 	
-	public static final String ORG2_PEER_0_URL = "grpc://localhost:8051";
+	public static final String ORG2_PEER_0_URL = "grpc://localhost:9051";
 	
 	public static final String ORG2_PEER_1 = "peer1.org2.acme.org";
 	
