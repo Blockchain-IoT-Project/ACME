@@ -1,5 +1,6 @@
 import static java.nio.charset.StandardCharsets.UTF_8;
 
+import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -8,6 +9,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.Properties;
 import java.util.concurrent.CompletableFuture;
+import java.sql.Timestamp;
 
 import Config.Config;
 import User.UserContext;
@@ -27,7 +29,7 @@ public class InvokeChaincode {
 	private static final byte[] EXPECTED_EVENT_DATA = "!".getBytes(UTF_8);
 	private static final String EXPECTED_EVENT_NAME = "event";
 
-	public static void main(String args[]) {
+	public static void main(String[] args) {
 		try {
             Util.cleanUp();
 			String caUrl = Config.CA_ORG1_URL;
@@ -61,13 +63,19 @@ public class InvokeChaincode {
 			
 			//ChannelClient channelClient = fabClient.createChannelClient(Config.CHANNEL_NAME);
 
+			//get Timestamp
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+			Timestamp newTimestamp = new Timestamp(System.currentTimeMillis());
 			
 			//Setup request
 			TransactionProposalRequest request = fabClient.getInstance().newTransactionProposalRequest();
 			ChaincodeID ccid = ChaincodeID.newBuilder().setName(Config.CHAINCODE_1_NAME).build();
 			request.setChaincodeID(ccid);
 			request.setFcn("write");
-			String[] arguments = { "tag2", "4", "2019-01-01 14:22:11" };
+			if(args.length != 2){
+				System.exit(0);
+			}
+			String[] arguments = { args[0], args[1], sdf.format(newTimestamp) };
 			request.setArgs(arguments);
 			request.setProposalWaitTime(10000);
 
@@ -110,56 +118,7 @@ public class InvokeChaincode {
 
 			//submit it
 			CompletableFuture<BlockEvent.TransactionEvent> transactionEventCompleteableFuture = channel.sendTransaction(successful);
-			
-			/*
-			//Enroll User to Org1MSP
-			UserContext newUserContext = new UserContext();
-			newUserContext.setName("user");
-			newUserContext.setAffiliation("org1");
-			newUserContext.setMspId("Org1MSP");
-			caClient.enrollUser(newUserContext, "secret");
 
-			//Setup FabricClient
-
-			FabricClient newFabricClient = new FabricClient(newUserContext);
-
-			//Initialize Channel with Peer, EventHub and Orderer
-			//Question is if necessary
-			ChannelClient newChannelClient = newFabricClient.createChannelClient(Config.CHANNEL_NAME);
-			Channel newChannel = newChannelClient.getChannel();
-			Peer peer = newFabricClient.getInstance().newPeer(Config.ORG1_PEER_0, Config.ORG1_PEER_0_URL);
-			EventHub eventHub = newFabricClient.getInstance().newEventHub("eventhub01", "grpc://localhost:7053");
-			Orderer orderer = newFabricClient.getInstance().newOrderer(Config.ORDERER_NAME, Config.ORDERER_URL);
-			newChannel.addPeer(peer);
-			newChannel.addEventHub(eventHub);
-			newChannel.addOrderer(orderer);
-			newChannel.initialize();
-
-			//Setup request
-			//With normal arguments
-			TransactionProposalRequest request = newFabricClient.getInstance().newTransactionProposalRequest();
-			ChaincodeID ccid = ChaincodeID.newBuilder().setName("ChainCode_Name").build();
-			request.setChaincodeID(ccid);
-			request.setFcn("FunctionName");
-			String[] arguments = {"Wert1", "Wert2", "Wert3", "Wert4", "Wert5"};
-			request.setArgs(arguments);
-			request.setProposalWaitTime(1000);
-
-			//As byte stream
-			Map<String, byte[]> byteStream = new HashMap<>();
-			byteStream.put("HyperledgerFabric", "TransactionProposalRequest:JavaSDK".getBytes(UTF_8));
-			byteStream.put("method", "TransactionProposalRequest".getBytes(UTF_8));
-			byteStream.put("result", ":)".getBytes(UTF_8));
-			byteStream.put("event", "!".getBytes(UTF_8));
-
-			request.setTransientMap(byteStream);
-
-			//Send request
-			Collection<ProposalResponse> responses = newChannelClient.sendTransactionProposal(request);
-			for (ProposalResponse res: responses) {
-				Status status = res.getStatus();
-				Logger.getLogger(InvokeChaincode.class.getName()).log(Level.INFO,"Invoked createCar on "+Config.CHAINCODE_1_NAME + ". Status - " + status);
-			} */
 
 		} catch (Exception e) {
 			e.printStackTrace();
