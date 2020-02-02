@@ -67,9 +67,9 @@ public class InvokeChaincode {
 			ChaincodeID ccid = ChaincodeID.newBuilder().setName(Config.CHAINCODE_1_NAME).build();
 			request.setChaincodeID(ccid);
 			request.setFcn("write");
-			String[] arguments = { "tag1", "4", "2019-01-01 14:22:11" };
+			String[] arguments = { "tag2", "4", "2019-01-01 14:22:11" };
 			request.setArgs(arguments);
-			request.setProposalWaitTime(1000);
+			request.setProposalWaitTime(10000);
 
 			//Once with arguments and once as bytes
 
@@ -82,10 +82,13 @@ public class InvokeChaincode {
 
 			//Send request
 			Collection<ProposalResponse> responses = channel.sendTransactionProposal(request, channel.getPeers());
+            //Collection<ProposalResponse> responses = channelClient.sendTransactionProposal(request);
 			for (ProposalResponse res: responses) {
 				Status status = res.getStatus();
-				Logger.getLogger(InvokeChaincode.class.getName()).log(Level.INFO,"Invoked write on " + Config.CHAINCODE_1_NAME + ". Status - " + status);
+				String response = res.getProposalResponse().getResponse().toString();
+				Logger.getLogger(InvokeChaincode.class.getName()).log(Level.INFO,"Invoked write on " + Config.CHAINCODE_1_NAME + ". Status - " + status + "\n"+ response);
 			}
+			//2736
 
 
 			// split all the responses up into failed and successful ones
