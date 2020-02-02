@@ -1,15 +1,14 @@
 import static java.nio.charset.StandardCharsets.UTF_8;
 
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Properties;
+import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import User.UserContext;
-import org.hyperledger.fabric.sdk.Channel;
-import org.hyperledger.fabric.sdk.EventHub;
-import org.hyperledger.fabric.sdk.Orderer;
-import org.hyperledger.fabric.sdk.Peer;
-import org.hyperledger.fabric.sdk.ProposalResponse;
+import org.hyperledger.fabric.sdk.*;
 
 import Util.Util;
 import Config.Config;
@@ -26,8 +25,7 @@ public class QueryChaincode {
             //Setup CAClient
 			String caUrl = Config.CA_ORG1_URL;
 
-			/*old
-			CAClient caClient = new CAClient(caUrl, null);
+			CAClient caClient = new CAClient(caUrl, new Properties());
 
 			// Enroll Admin to Org1MSP
 			UserContext adminUserContext = new UserContext();
@@ -46,27 +44,48 @@ public class QueryChaincode {
             //Setup ChannelClient for Channel with name
             ChannelClient channelClient = fabClient.createChannelClient(Config.CHANNEL_NAME);
             Channel channel = channelClient.getChannel();
-            Peer peer = fabClient.getInstance().newPeer(Config.ORG1_PEER_0, Config.ORG1_PEER_0_URL);
-            EventHub eventHub = fabClient.getInstance().newEventHub("eventhub01", "grpc://localhost:7053");
+            Peer peerorg1 = fabClient.getInstance().newPeer(Config.ORG1_PEER_0, Config.ORG1_PEER_0_URL);
+			Peer peerorg2 = fabClient.getInstance().newPeer(Config.ORG2_PEER_0, Config.ORG2_PEER_0_URL);
+            //EventHub eventHub = fabClient.getInstance().newEventHub("eventhub01", "grpc://localhost:7053");
             Orderer orderer = fabClient.getInstance().newOrderer(Config.ORDERER_NAME, Config.ORDERER_URL);
-            channel.addPeer(peer);
-            channel.addEventHub(eventHub);
+            channel.addPeer(peerorg1);
+			channel.addPeer(peerorg2);
+            //channel.addEventHub(eventHub);
             channel.addOrderer(orderer);
             channel.initialize();
 
+
+
+			String arguments= "a";
+
             //Query
-			Logger.getLogger(QueryChaincode.class.getName()).log(Level.INFO, "Querying for all cars ...");
-			Collection<ProposalResponse>  responsesQuery = channelClient.queryByChainCode("fabcar", "queryAllCars", null);
-			for (ProposalResponse pres : responsesQuery) {
-				String stringResponse = new String(pres.getChaincodeActionResponsePayload());
+			Logger.getLogger(QueryChaincode.class.getName()).log(Level.INFO, "Querying ...");
+
+			QueryByChaincodeRequest request = fabClient.getInstance().newQueryProposalRequest();
+			ChaincodeID ccid = ChaincodeID.newBuilder().setName("acme_cc_s1").build();
+			request.setChaincodeID(ccid);
+			request.setFcn("query");
+			if (arguments != null)
+				request.setArgs(arguments);
+
+			Collection<ProposalResponse> response = channel.queryByChaincode(request);
+
+			//Collection<ProposalResponse>  responsesQuery = channelClient.queryByChainCode("fabcar", "queryAllCars", null);
+			for (ProposalResponse pres : response) {
+				String stringResponse = new String(pres.getMessage() + " " + pres.getPeer().getName());
 				Logger.getLogger(QueryChaincode.class.getName()).log(Level.INFO, stringResponse);
+
+				//Logger.getLogger(QueryChaincode.class.getName()).log(Level.INFO,pres.getProposalResponse().getPayload().toStringUtf8());
 			}
 
-			Thread.sleep(10000);
+
+
+			/*
+			Thread.sleep(100000);
 			String[] args1 = {"CAR1"};
 			Logger.getLogger(QueryChaincode.class.getName()).log(Level.INFO, "Querying for a car - " + args1[0]);
-
-
+			*/
+			/*
 			//Output
 			Collection<ProposalResponse>  responses1Query = channelClient.queryByChainCode("fabcar", "queryCar", args1);
 			for (ProposalResponse pres : responses1Query) {
@@ -90,7 +109,7 @@ public class QueryChaincode {
             //for enroll https://github.com/hyperledger/fabric-sdk-java/blob/master/src/main/java/org/hyperledger/fabric_ca/sdk/HFCAClient.java ab line 420
 
 
-
+            /*
 			//instead of enrolladmin, we can register and enroll user
 			CAClient newCAClient = new CAClient(caUrl, null);
 			UserContext newUserContext = new UserContext();
@@ -131,7 +150,7 @@ public class QueryChaincode {
             for (ProposalResponse pres : responses1Query) {
                 String stringResponse = new String(pres.getChaincodeActionResponsePayload());
                 Logger.getLogger(QueryChaincode.class.getName()).log(Level.INFO, stringResponse);
-            }
+            }*/
 
 
 
