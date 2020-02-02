@@ -17,7 +17,7 @@ verifyResult() {
     echo "!!!!!!!!!!!!!!! "$2" !!!!!!!!!!!!!!!!"
     echo "========= ERROR !!! FAILED to execute End-2-End Scenario ==========="
     echo
-    #exit 1
+    exit 1
   fi
 }
 
@@ -214,7 +214,7 @@ chaincodeQuery() {
     echo "!!!!!!!!!!!!!!! Query result on peer${PEER}.org${ORG} is INVALID !!!!!!!!!!!!!!!!"
     echo "================== ERROR !!! FAILED to execute End-2-End Scenario =================="
     echo
-    #exit 1
+    exit 1
   fi
 }
 

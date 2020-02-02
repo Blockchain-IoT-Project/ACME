@@ -25,7 +25,7 @@ DELAY="$2"
 LANGUAGE="$3"
 TIMEOUT="$4"
 VERBOSE="$5"
-: ${CHANNEL_NAME:="mychannel"}
+: ${CHANNEL_NAME:="s2"}
 : ${TIMEOUT:="10"}
 : ${LANGUAGE:="java"}
 : ${VERBOSE:="false"}
@@ -35,7 +35,6 @@ MAX_RETRY=5
 
 CC_SRC_PATH="/opt/gopath/src/github.com/chaincode/"
 
-echo "Channel name : "$CHANNEL_NAME
 
 # import functions
 . scripts/utils.sh
