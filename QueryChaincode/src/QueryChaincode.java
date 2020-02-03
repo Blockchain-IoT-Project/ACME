@@ -18,7 +18,7 @@ public class QueryChaincode {
 	private static final byte[] EXPECTED_EVENT_DATA = "!".getBytes(UTF_8);
 	private static final String EXPECTED_EVENT_NAME = "event";
 
-	public static void main(String args[]) {
+	public static void main(String[] args) {
 		try {
             Util.cleanUp();
 
@@ -54,10 +54,6 @@ public class QueryChaincode {
             channel.addOrderer(orderer);
             channel.initialize();
 
-
-
-			String arguments= "a";
-
             //Query
 			Logger.getLogger(QueryChaincode.class.getName()).log(Level.INFO, "Querying ...");
 
@@ -65,8 +61,8 @@ public class QueryChaincode {
 			ChaincodeID ccid = ChaincodeID.newBuilder().setName("acme_cc_s1").build();
 			request.setChaincodeID(ccid);
 			request.setFcn("query");
-			if (arguments != null)
-				request.setArgs(arguments);
+			if (args.length != 0)
+				request.setArgs(args[0]);
 
 			Collection<ProposalResponse> response = channel.queryByChaincode(request);
 
