@@ -128,11 +128,11 @@ function networkUp () {
   fi
   # finish by running the test -> test won't run inside the script for some reason, calling it with docker exec on its own works just fine
   #echo $CHANNEL_NAME $CLI_DELAY $LANGUAGE $CLI_TIMEOUT $VERBOSE
-  #docker exec Org3cli ./scripts/testorg3.sh $CHANNEL_NAME $CLI_DELAY $LANGUAGE $CLI_TIMEOUT $VERBOSE
-  #if [ $? -ne 0 ]; then
-  #  echo "ERROR !!!! Unable to run test"
-  #  exit 1
-  #fi
+  docker exec Org3cli ./scripts/testorg3.sh $CHANNEL_NAME $CLI_DELAY $LANGUAGE $CLI_TIMEOUT $VERBOSE
+  if [ $? -ne 0 ]; then
+    echo "ERROR !!!! Unable to run test"
+    exit 1
+  fi
 }
 
 # Tear down running network
@@ -269,7 +269,9 @@ elif [ "$MODE" == "down" ]; then
 elif [ "$MODE" == "restart" ]; then
   EXPMODE="Restarting"
 elif [ "$MODE" == "generate" ]; then
-  EXPMODE="Generating certs and genesis block for"
+  EXPMODE="Generating certs and genesis block for"export PATH=${PWD}/../bin:${PWD}:$PATH
+export FABRIC_CFG_PATH=${PWD}
+export VERBOSE=false
 else
   printHelp
   exit 1

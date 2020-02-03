@@ -22,9 +22,16 @@ createChannel() {
 	echo "===================== Channel '$CHANNEL_NAME' created ===================== "
 	echo
 }
+joinChannel () {
+	CHANNEL_NAME=$1
+	joinChannelWithRetry 0 1 $CHANNEL_NAME
+	echo "===================== peer1.org1 joined channel '$CHANNEL_NAME' ===================== "
+	sleep 3
+}
 
 echo $1
 CHANNEL_NAME=$1
 echo "Creating channel $CHANNEL_NAME..."
 createChannel $CHANNEL_NAME
+joinChannel $CHANNEL_NAME
 
