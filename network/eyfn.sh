@@ -127,12 +127,11 @@ function networkUp () {
     exit 1
   fi
   # finish by running the test -> test won't run inside the script for some reason, calling it with docker exec on its own works just fine
-  #echo $CHANNEL_NAME $CLI_DELAY $LANGUAGE $CLI_TIMEOUT $VERBOSE
-  docker exec Org3cli ./scripts/testorg3.sh $CHANNEL_NAME $CLI_DELAY $LANGUAGE $CLI_TIMEOUT $VERBOSE
-  if [ $? -ne 0 ]; then
-    echo "ERROR !!!! Unable to run test"
-    exit 1
-  fi
+#  docker exec Org3cli ./scripts/testorg3.sh $CHANNEL_NAME $CLI_DELAY $LANGUAGE $CLI_TIMEOUT $VERBOSE
+#  if [ $? -ne 0 ]; then
+#    echo "ERROR !!!! Unable to run test"
+#    exit 1
+#  fi
 }
 
 # Tear down running network
