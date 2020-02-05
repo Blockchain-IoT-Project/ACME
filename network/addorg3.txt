@@ -1,0 +1,17 @@
+  $ sudo docker exec -it cli bash
+    1  export ORDERER_CA="/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/acme.org/msp/tlscacerts/tlsca.acme.org-cert.pem"
+    2  peer channel fetch config asdf_config.pb -o orderer.acme.org:7050 -c asdf
+    3  configtxlator proto_decode --input asdf_config.pb  --type common.Block | jq .data.data[0].payload.data.config > configasdf.json
+    4  less configasdf.json 
+    5  jq -s '.[0] * {"channel_group":{"groups":{"Application":{"groups": {"Org3MSP":.[1]}}}}}' configasdf.json ./channel-artifacts/org3.json > mod_conf.json
+    6  configtxlator proto_encode --input configasdf.json --type common.Config --output confasdf.pb
+    7  configtxlator proto_encode --input mod_conf.json --type common.Config --output modasdf.pb
+    8  configtxlator compute_update --channel_id asdf --original confasdf.pb --updated modasdf.pb  --output asdfupdate.pb
+    9  configtxlator proto_decode --input asdfupdate.pb --type common.ConfigUpdate | jq . > asdfupdate.json
+   10  echo '{"payload":{"header":{"channel_header":{"channel_id":"asdf", "type":2}},"data":{"config_update":'$(cat asdfupdate.json)'}}}' | jq . > asinenv.json
+   11  configtxlator proto_encode --input  asinenv.json  --type common.Envelope --output asdenv.pb
+   12  peer channel signconfigtx -f asdenv.pb 
+   13  peer channel update -f asdenv.pb -c asdf -o orderer.acme.org:7050
+$ sudo docker exec -it Org3cli bash
+    1  peer channel fetch 0 asdf.block -o orderer.acme.org:7050 -c asdf
+    2  peer channel join -b asdf.block
