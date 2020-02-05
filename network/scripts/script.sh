@@ -129,6 +129,19 @@ if [ "${NO_CHAINCODE}" != "true" ]; then
 	echo "Instantiating chaincode on peer0.org2 in s2..."
 	instantiateChaincode 0 1 's2'
 
+    ## Install chaincode on peer1.org1 and peer1.org2 for s1
+	echo "Installing chaincode on peer1.org1..."
+	installChaincode 1 1 's1' 1.0
+	echo "Install chaincode on peer1.org2..."
+	installChaincode 1 2 's1' 1.0
+
+	## Install chaincode on peer1.org1 and peer1.org2 for s2
+	echo "Installing chaincode on peer1.org1..."
+	installChaincode 1 1 's2' 1.0
+	echo "Install chaincode on peer1.org2..."
+	installChaincode 1 2 's2' 1.0
+	
+	
 	# switch back to Org1's identity before writing to the blockchain
 	setGlobals 0 1
 
@@ -137,13 +150,9 @@ if [ "${NO_CHAINCODE}" != "true" ]; then
 	chaincodeInvoke 's1' '{"Args": ["write", "a", "4", "1994-01-13 14:22:11"]}' 0 1 0 2
 
 	# Invoke chaincode on peer0.org1 and peer0.org2 in s2
-	echo "Sending invoke transaction on peer0.org1 and peer0.org2 in s2..."
-	chaincodeInvoke 's2' '{"Args": ["write", "a", "4", "1994-01-13 14:22:11"]}' 0 1 0 2
+	echo "Sending invoke transaction on peer1.org1 and peer1.org2 in s2..."
+	chaincodeInvoke 's2' '{"Args": ["write", "a", "4", "1994-01-13 14:22:11"]}' 1 1 1 2
 	
-
-	## Install chaincode on peer1.org2
-	echo "Installing chaincode on peer1.org2..."
-	installChaincode 1 2 's2' 1.0
 
 	# Query chaincode on peer0.org1 in s2
 	echo "Querying chaincode on peer0.org1 in s1..."

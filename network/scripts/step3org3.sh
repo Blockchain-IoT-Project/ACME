@@ -39,6 +39,11 @@ installChaincode 0 1 $CHANNEL_NAME 2.0
 echo "===================== Installing chaincode 2.0 on peer0.org2 ===================== "
 installChaincode 0 2 $CHANNEL_NAME 2.0
 
+echo "===================== Installing chaincode 2.0 on peer1.org1 ===================== "
+installChaincode 1 1 $CHANNEL_NAME 2.0
+echo "===================== Installing chaincode 2.0 on peer1.org2 ===================== "
+installChaincode 1 2 $CHANNEL_NAME 2.0
+
 echo "===================== Upgrading chaincode on peer0.org1 ===================== "
 upgradeChaincode 0 1 $CHANNEL_NAME 2.0
 

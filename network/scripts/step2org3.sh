@@ -48,6 +48,9 @@ echo "===================== peer1.org3 joined channel '$CHANNEL_NAME' ==========
 echo "Installing chaincode 2.0 on peer0.org3..."
 installChaincode 0 3 $CHANNEL_NAME 2.0
 
+echo "Installing chaincode 2.0 on peer1.org3..."
+installChaincode 1 3 $CHANNEL_NAME 2.0
+
 echo
 echo "========= Org3 is now halfway onto your first network ========= "
 echo
