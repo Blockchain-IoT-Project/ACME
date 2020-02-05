@@ -23,17 +23,17 @@ public class QueryChaincode {
             Util.cleanUp();
 
             //Setup CAClient
-			String caUrl = Config.CA_ORG1_URL;
+			String caUrl_org1 = Config.CA_ORG1_URL;
 
-			CAClient caClient = new CAClient(caUrl, new Properties());
+			CAClient caClient = new CAClient(caUrl_org1, new Properties());
 
-			// Enroll Admin to Org1MSP
+			// Enroll Admin to Org1MSP for Channel_1
 			UserContext adminUserContext = new UserContext();
 			adminUserContext.setName(Config.ADMIN);
 			adminUserContext.setAffiliation(Config.ORG1);
 			adminUserContext.setMspId(Config.ORG1_MSP);
 
-			//Setup CAClient mit Admin Context + enroll admin
+			//Setup CAClient mit Admin Context + enroll admin for Channel_1
 			caClient.setAdminUserContext(adminUserContext);
 			adminUserContext = caClient.enrollAdminUser(Config.ADMIN, Config.ADMIN_PASSWORD);
 
@@ -42,20 +42,33 @@ public class QueryChaincode {
 			FabricClient fabClient = new FabricClient(adminUserContext);
 
             //Setup ChannelClient for Channel with name
-            ChannelClient channelClient = fabClient.createChannelClient(Config.CHANNEL_NAME);
-            Channel channel = channelClient.getChannel();
-            Peer peerorg1 = fabClient.getInstance().newPeer(Config.ORG1_PEER_0, Config.ORG1_PEER_0_URL);
-			Peer peerorg2 = fabClient.getInstance().newPeer(Config.ORG2_PEER_0, Config.ORG2_PEER_0_URL);
-            //EventHub eventHub = fabClient.getInstance().newEventHub("eventhub01", "grpc://localhost:7053");
-            Orderer orderer = fabClient.getInstance().newOrderer(Config.ORDERER_NAME, Config.ORDERER_URL);
-            channel.addPeer(peerorg1);
-			channel.addPeer(peerorg2);
-            //channel.addEventHub(eventHub);
-            channel.addOrderer(orderer);
-            channel.initialize();
+            ChannelClient channel_1_Client = fabClient.createChannelClient(Config.CHANNEL_1_NAME);
+            Channel channel_1 = channel_1_Client.getChannel();
+            Peer c1_peerorg1 = fabClient.getInstance().newPeer(Config.ORG1_PEER_0, Config.ORG1_PEER_0_URL);
+			Peer c1_peerorg2 = fabClient.getInstance().newPeer(Config.ORG2_PEER_0, Config.ORG2_PEER_0_URL);
 
-            //Query
+			Peer c1_peer1org1 = fabClient.getInstance().newPeer(Config.ORG1_PEER_1, Config.ORG1_PEER_1_URL);
+            Peer c1_peer1org2 = fabClient.getInstance().newPeer(Config.ORG2_PEER_1, Config.ORG2_PEER_1_URL);
+
+            Orderer c1_orderer = fabClient.getInstance().newOrderer(Config.ORDERER_NAME, Config.ORDERER_URL);
+            channel_1.addPeer(c1_peerorg1);
+			channel_1.addPeer(c1_peerorg2);
+			channel_1.addPeer(c1_peer1org1);
+			channel_1.addPeer(c1_peer1org2);
+
+            channel_1.addOrderer(c1_orderer);
+            channel_1.initialize();
+
+            //clear Console
+			System.out.print("\033[H\033[2J");
+			System.out.flush();
+
+			System.out.println("-----------------------------------------------------------------------");
+
+			//Query
 			Logger.getLogger(QueryChaincode.class.getName()).log(Level.INFO, "Querying ...");
+
+			System.out.println("Ausgabe für Channel 1");
 
 			QueryByChaincodeRequest request = fabClient.getInstance().newQueryProposalRequest();
 			ChaincodeID ccid = ChaincodeID.newBuilder().setName("acme_cc_s1").build();
@@ -64,9 +77,8 @@ public class QueryChaincode {
 			if (args.length != 0)
 				request.setArgs(args[0]);
 
-			Collection<ProposalResponse> response = channel.queryByChaincode(request);
-
-			//Collection<ProposalResponse>  responsesQuery = channelClient.queryByChainCode("fabcar", "queryAllCars", null);
+			Collection<ProposalResponse> response = channel_1.queryByChaincode(request);
+			//Collection<ProposalResponse>  responsesQuery = channel_1_Client.queryByChainCode("fabcar", "queryAllCars", null);
 			for (ProposalResponse pres : response) {
 				String stringResponse = new String(pres.getMessage() + " " + pres.getPeer().getName());
 				Logger.getLogger(QueryChaincode.class.getName()).log(Level.INFO, stringResponse);
@@ -76,83 +88,73 @@ public class QueryChaincode {
 
 
 
-			/*
-			Thread.sleep(100000);
-			String[] args1 = {"CAR1"};
-			Logger.getLogger(QueryChaincode.class.getName()).log(Level.INFO, "Querying for a car - " + args1[0]);
-			*/
-			/*
-			//Output
-			Collection<ProposalResponse>  responses1Query = channelClient.queryByChainCode("fabcar", "queryCar", args1);
-			for (ProposalResponse pres : responses1Query) {
-				String stringResponse = new String(pres.getChaincodeActionResponsePayload());
-				Logger.getLogger(QueryChaincode.class.getName()).log(Level.INFO, stringResponse);
-			}*/
+			//-------------------------------------------------------------------------------------
+			//Same for Channel2
 
-			/*
-			Which properties do i need:
-			CAUrl
-			UserName
-			OrgName
-			MspId
-			Secret = password
-			ChannelName
-			ChainCodeName
-			FunctionName
-			FunctionArgs
-			 */
-			// enroll is only 1 time possible, after that registerUser
-            //for enroll https://github.com/hyperledger/fabric-sdk-java/blob/master/src/main/java/org/hyperledger/fabric_ca/sdk/HFCAClient.java ab line 420
+			//Setup CAClient
+			String caUrl_org2 = Config.CA_ORG2_URL;
 
+			CAClient caClient_2 = new CAClient(caUrl_org2, new Properties());
 
-            /*
-			//instead of enrolladmin, we can register and enroll user
-			CAClient newCAClient = new CAClient(caUrl, null);
-			UserContext newUserContext = new UserContext();
-			newUserContext.setName("user");
-			newUserContext.setAffiliation("org1"); // from config
-			newUserContext.setMspId("Org1MSP"); // from config
+			// Enroll Admin to Org1MSP for Channel_1
+			UserContext adminUserContext_c2 = new UserContext();
+			adminUserContext_c2.setName(Config.ADMIN);
+			adminUserContext_c2.setAffiliation(Config.ORG1);
+			adminUserContext_c2.setMspId(Config.ORG1_MSP);
 
-			newUserContext = newCAClient.enrollUser(newUserContext,"secret"); //i don't knwo what they mean with secret
+			//Setup CAClient mit Admin Context + enroll admin for Channel_1
+			caClient_2.setAdminUserContext(adminUserContext_c2);
+			adminUserContext_c2 = caClient_2.enrollAdminUser(Config.ADMIN, Config.ADMIN_PASSWORD);
 
-			FabricClient newFabClient = new FabricClient(newUserContext);
-
-			ChannelClient newChannelClient = newFabClient.createChannelClient(Config.CHANNEL_NAME);
-
-			// i think not needed, query is going over ChannelClient
-			Channel newChannel = newChannelClient.getChannel();
-			Peer newPeer = newFabClient.getInstance().newPeer(Config.ORG1_PEER_0, Config.ORG1_PEER_0_URL);
-			EventHub newEventHub = newFabClient.getInstance().newEventHub("eventhub01","grpc://localhost:7053");
-			Orderer newOrderer = newFabClient.getInstance().newOrderer(Config.ORDERER_NAME, Config.ORDERER_URL);
-			newChannel.addPeer(newPeer);
-			newChannel.addEventHub(newEventHub);
-			newChannel.addOrderer(newOrderer);
-			newChannel.initialize();
-
-            Logger.getLogger(QueryChaincode.class.getName()).log(Level.INFO, "Querying for all cars ...");
-            Collection<ProposalResponse>  responsesQuery = newChannelClient.queryByChainCode("fabcar", "queryAllCars", null);
-            for (ProposalResponse pres : responsesQuery) {
-                String stringResponse = new String(pres.getChaincodeActionResponsePayload());
-                Logger.getLogger(QueryChaincode.class.getName()).log(Level.INFO, stringResponse);
-            }
-
-            Thread.sleep(10000);
-            String[] args1 = {"CAR1"};
-            Logger.getLogger(QueryChaincode.class.getName()).log(Level.INFO, "Querying for a car - " + args1[0]);
-
-
-            //Output
-            Collection<ProposalResponse>  responses1Query = newChannelClient.queryByChainCode("fabcar", "queryCar", args1);
-            for (ProposalResponse pres : responses1Query) {
-                String stringResponse = new String(pres.getChaincodeActionResponsePayload());
-                Logger.getLogger(QueryChaincode.class.getName()).log(Level.INFO, stringResponse);
-            }*/
-
-
-
-
+			//Setup Client
+			//FabricClient == HFClient where adminUserContext als setUserContext vervendet wird
+			FabricClient fabClient_c2 = new FabricClient(adminUserContext_c2);
 
 			
+			ChannelClient channel_2_Client = fabClient_c2.createChannelClient(Config.CHANNEL_2_NAME);
+			Channel channel_2 = channel_2_Client.getChannel();
+			Peer c2_peerorg1 = fabClient_c2.getInstance().newPeer(Config.ORG1_PEER_0, Config.ORG1_PEER_0_URL);
+			Peer c2_peerorg2 = fabClient_c2.getInstance().newPeer(Config.ORG2_PEER_0, Config.ORG2_PEER_0_URL);
+
+			Peer c2_peer1org1 = fabClient.getInstance().newPeer(Config.ORG1_PEER_1, Config.ORG1_PEER_1_URL);
+			Peer c2_peer1org2 = fabClient.getInstance().newPeer(Config.ORG2_PEER_1, Config.ORG2_PEER_1_URL);
+
+			Peer c2_peer0org3 = fabClient.getInstance().newPeer(Config.ORG3_PEER_0, Config.ORG3_PEER_0_URL);
+			Peer c2_peer1org3 = fabClient.getInstance().newPeer(Config.ORG3_PEER_1, Config.ORG3_PEER_1_URL);
+			Orderer c2_orderer = fabClient_c2.getInstance().newOrderer(Config.ORDERER_NAME, Config.ORDERER_URL);
+			channel_2.addPeer(c2_peerorg1);
+			channel_2.addPeer(c2_peerorg2);
+
+			channel_2.addPeer(c2_peer1org1);
+			channel_2.addPeer(c2_peer1org2);
+
+			channel_2.addPeer(c2_peer0org3);
+			channel_2.addPeer(c2_peer1org3);
+			channel_2.addOrderer(c2_orderer);
+			channel_2.initialize();
+
+			System.out.println("-----------------------------------------------------------------------");
+			System.out.println("Ausgabe für Channel 2");
+
+			QueryByChaincodeRequest request_2 = fabClient_c2.getInstance().newQueryProposalRequest();
+			ChaincodeID ccid_2 = ChaincodeID.newBuilder().setName("acme_cc_s2").build();
+			request_2.setChaincodeID(ccid_2);
+			request_2.setFcn("query");
+			if (args.length != 0)
+				request_2.setArgs(args[0]);
+
+			Collection<ProposalResponse> response_2 = channel_2.queryByChaincode(request_2);
+
+			for (ProposalResponse pres_2 : response_2) {
+				String stringResponse = new String(pres_2.getMessage() + " " + pres_2.getPeer().getName());
+				Logger.getLogger(QueryChaincode.class.getName()).log(Level.INFO, stringResponse);
+
+				//Logger.getLogger(QueryChaincode.class.getName()).log(Level.INFO,pres.getProposalResponse().getPayload().toStringUtf8());
+			}
+
+			System.out.println("-----------------------------------------------------------------------");
+
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
