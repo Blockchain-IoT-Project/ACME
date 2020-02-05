@@ -40,7 +40,9 @@ public class Config {
 	
 	public static final String ORDERER_NAME = "orderer.acme.org";
 	
-	public static final String CHANNEL_NAME = "s1";
+	public static final String CHANNEL_1_NAME = "s1";
+
+    public static final String CHANNEL_2_NAME = "s2";
 	
 	public static final String ORG1_PEER_0 = "peer0.org1.acme.org";
 	
@@ -48,7 +50,7 @@ public class Config {
 	
 	public static final String ORG1_PEER_1 = "peer1.org1.acme.org";
 	
-	public static final String ORG1_PEER_1_URL = "grpc://localhost:7056";
+	public static final String ORG1_PEER_1_URL = "grpc://localhost:8051";
 	
     public static final String ORG2_PEER_0 = "peer0.org2.acme.org";
 	
@@ -56,7 +58,15 @@ public class Config {
 	
 	public static final String ORG2_PEER_1 = "peer1.org2.acme.org";
 	
-	public static final String ORG2_PEER_1_URL = "grpc://localhost:8056";
+	public static final String ORG2_PEER_1_URL = "grpc://localhost:10051";
+
+	public static final String ORG3_PEER_0 = "peer0.org3.acme.org";
+
+	public static final String ORG3_PEER_0_URL = "grpc://localhost:11051";
+
+	public static final String ORG3_PEER_1 = "peer1.org3.acme.org";
+
+	public static final String ORG3_PEER_1_URL = "grpc://localhost:12051";
 	
 	public static final String CHAINCODE_ROOT_DIR = "chaincode";
 	
