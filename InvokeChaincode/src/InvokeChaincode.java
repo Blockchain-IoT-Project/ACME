@@ -37,11 +37,11 @@ public class InvokeChaincode {
 			Channel2(args);
 
 		} else if (args.length == 3 ) {
-            if (args[2].equals("c1")) {
+            if (args[2].equals("s1")) {
 
                 Channel1(args);
 
-            } else if (args[2].equals("c2")) {
+            } else if (args[2].equals("s2")) {
 
                 Channel2(args);
 
