@@ -31,11 +31,11 @@ public class QueryChaincode {
 				Channel_2(args);
 
 				System.out.println("-----------------------------------------------------------------------");
-			} else if (args[1].equals("c1")) {
+			} else if (args[1].equals("s1")) {
 
 				Channel_1(args);
 				System.out.println("-----------------------------------------------------------------------");
-			} else if (args[1].equals("c2")) {
+			} else if (args[1].equals("s2")) {
 
 				Channel_2(args);
 				System.out.println("-----------------------------------------------------------------------");
