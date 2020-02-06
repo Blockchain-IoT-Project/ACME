@@ -8,7 +8,8 @@ MAXTEMP=400
 
 # path to the java executable
 JARPATH=$1
-
+CHANNEL=$2
+: ${CHANNEL:=""}
 # colors, baby!
 GREEN='\033[0;32m'
 BLUE='\033[0;34m'
@@ -22,8 +23,8 @@ TAGS="t1 t2 t3 t4"
 for tag in $TAGS; do
   # get a first random number for that tag
 
-  echo -e "${BLUE}Reading value for tag $tag from s1${NC}"
-  java -cp $JARPATH  QueryChaincode $tag s1
+  echo -e "${BLUE}Reading values for tag $tag ${NC}"
+  java -cp $JARPATH  QueryChaincode $tag $CHANNEL
 
   if [ $? -eq 0 ]; then
     echo
@@ -34,24 +35,6 @@ for tag in $TAGS; do
   	echo -e "${RED}FAILURE!${NC}"
   	echo
   fi
-
-  # now get a second random number
-  val=$(($RANDOM % MAXTEMP))
-
-  echo -e "${BLUE}Reading value for tag $tag from s2${NC}"
-  java -cp $JARPATH  QueryChaincode $tag s2
-
-  if [ $? -eq 0 ]; then
-    echo
-  	echo -e "${GREEN}SUCCESS!${NC}"
-  	echo
-  else
-    echo
-  	echo -e "${RED}FAILURE!${NC}"
-  	echo
-  fi
-
-
 
   echo
   echo
