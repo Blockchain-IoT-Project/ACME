@@ -24,7 +24,7 @@ for tag in $TAGS; do
   val=$(($RANDOM % MAXTEMP))
 
   echo -e "${BLUE}Writing value $val for tag $tag into s1${NC}"
-  java -cp $JARPATH  InvokeChaincode $tag $val
+  java -cp $JARPATH  InvokeChaincode $tag $val s1
 
   if [ $? -eq 0 ]; then
     echo
@@ -40,7 +40,7 @@ for tag in $TAGS; do
   val=$(($RANDOM % MAXTEMP))
 
   echo -e "${BLUE}Writing value $val for tag $tag into s2${NC}"
-  java -cp $JARPATH  InvokeChaincode $tag $val
+  java -cp $JARPATH  InvokeChaincode $tag $val s2
 
   if [ $? -eq 0 ]; then
     echo
