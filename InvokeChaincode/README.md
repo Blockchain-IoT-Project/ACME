@@ -4,5 +4,5 @@
 - Also tidy up the mess that is InvokeChaincode.java
 - For debugging on the endorsment issue, check docker logs with `docker logs peer[i].org[j].acme.org` or `docker logs orderer.acme.org`
 - Invoke runs with no error and return the chaincode newSuccessResponse
-- Input: [tagname] [value] 
+- Input: [tagname] [value] optional [channel]
 - Output: Status + ProposelResponse -> Response
