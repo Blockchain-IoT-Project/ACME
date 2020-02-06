@@ -145,12 +145,12 @@ instantiateChaincode() {
   # the "-o" option
   if [ -z "$CORE_PEER_TLS_ENABLED" -o "$CORE_PEER_TLS_ENABLED" = "false" ]; then
     set -x
-    peer chaincode instantiate -o orderer.acme.org:7050 -C $CHANNEL_NAME -n acme_cc_$CHANNEL_NAME -l ${LANGUAGE} -v ${VERSION} -c '{"Args":["init", "C"]}' -P "AND ('Org1MSP.peer','Org2MSP.peer')" >&log.txt
+    peer chaincode instantiate -o orderer.acme.org:7050 -C $CHANNEL_NAME -n acme_cc_$CHANNEL_NAME -l ${LANGUAGE} -v ${VERSION} -c '{"Args":["init", "C"]}' -P "AND ('Org1MSP.peer')" >&log.txt
     res=$?
     set +x
   else
     set -x
-    peer chaincode instantiate -o orderer.acme.org:7050 --tls $CORE_PEER_TLS_ENABLED --cafile $ORDERER_CA -C $ -n acme_cc_$CHANNEL_NAME -l ${LANGUAGE} -v 1.0 -c '{"Args":["init", "C"]}' -P "AND ('Org1MSP.peer','Org2MSP.peer')" >&log.txt
+    peer chaincode instantiate -o orderer.acme.org:7050 --tls $CORE_PEER_TLS_ENABLED --cafile $ORDERER_CA -C $ -n acme_cc_$CHANNEL_NAME -l ${LANGUAGE} -v 1.0 -c '{"Args":["init", "C"]}' -P "AND ('Org1MSP.peer')" >&log.txt
     res=$?
     set +x
   fi
@@ -167,7 +167,7 @@ upgradeChaincode() {
   setGlobals $PEER $ORG
 
   set -x
-  peer chaincode upgrade -o orderer.acme.org:7050  -C $CHANNEL_NAME -n acme_cc_$CHANNEL_NAME -v 2.0 -c '{"Args":["init", "C"]}' -P "AND ('Org1MSP.peer','Org2MSP.peer','Org3MSP.peer')"  # --tls $CORE_PEER_TLS_ENABLED --cafile $ORDERER_CA
+  peer chaincode upgrade -o orderer.acme.org:7050  -C $CHANNEL_NAME -n acme_cc_$CHANNEL_NAME -v 2.0 -c '{"Args":["init", "C"]}' -P "AND ('Org1MSP.peer')"  # --tls $CORE_PEER_TLS_ENABLED --cafile $ORDERER_CA
   res=$?
   set +x
   cat log.txt

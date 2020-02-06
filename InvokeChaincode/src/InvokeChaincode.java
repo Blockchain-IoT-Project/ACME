@@ -74,14 +74,14 @@ public class InvokeChaincode {
 			ChannelClient channelClient = fabClient.createChannelClient(Config.CHANNEL_1_NAME);
 			Channel channel = channelClient.getChannel();
 			Peer peer0org1 = fabClient.getInstance().newPeer(Config.ORG1_PEER_0, Config.ORG1_PEER_0_URL);
-            Peer peer0org2 = fabClient.getInstance().newPeer(Config.ORG2_PEER_0, Config.ORG2_PEER_0_URL);
+            //Peer peer0org2 = fabClient.getInstance().newPeer(Config.ORG2_PEER_0, Config.ORG2_PEER_0_URL);
             Peer peer1org1 = fabClient.getInstance().newPeer(Config.ORG1_PEER_1, Config.ORG1_PEER_1_URL);
-            Peer peer1org2 = fabClient.getInstance().newPeer(Config.ORG2_PEER_1, Config.ORG2_PEER_1_URL);
+            //Peer peer1org2 = fabClient.getInstance().newPeer(Config.ORG2_PEER_1, Config.ORG2_PEER_1_URL);
 			Orderer orderer = fabClient.getInstance().newOrderer(Config.ORDERER_NAME, Config.ORDERER_URL);
 			channel.addPeer(peer0org1);
-            channel.addPeer(peer0org2);
+            //channel.addPeer(peer0org2);
             channel.addPeer(peer1org1);
-            channel.addPeer(peer1org2);
+            //channel.addPeer(peer1org2);
 			channel.addOrderer(orderer);
 			channel.initialize();
 
@@ -169,18 +169,18 @@ public class InvokeChaincode {
 			ChannelClient channelClient = fabClient_c2.createChannelClient(Config.CHANNEL_2_NAME);
 			Channel channel = channelClient.getChannel();
 			Peer peer0org1_c2 = fabClient_c2.getInstance().newPeer(Config.ORG1_PEER_0, Config.ORG1_PEER_0_URL);
-            Peer peer0org2_c2 = fabClient_c2.getInstance().newPeer(Config.ORG2_PEER_0, Config.ORG2_PEER_0_URL);
+            //Peer peer0org2_c2 = fabClient_c2.getInstance().newPeer(Config.ORG2_PEER_0, Config.ORG2_PEER_0_URL);
             Peer peer1org1_c2 = fabClient_c2.getInstance().newPeer(Config.ORG1_PEER_1, Config.ORG1_PEER_1_URL);
-            Peer peer1org2_c2 = fabClient_c2.getInstance().newPeer(Config.ORG2_PEER_1, Config.ORG2_PEER_1_URL);
-            Peer peer0org3_c2 = fabClient_c2.getInstance().newPeer(Config.ORG3_PEER_0, Config.ORG3_PEER_0_URL);
-            Peer peer1org3_c2 = fabClient_c2.getInstance().newPeer(Config.ORG3_PEER_1, Config.ORG3_PEER_1_URL);
+            //Peer peer1org2_c2 = fabClient_c2.getInstance().newPeer(Config.ORG2_PEER_1, Config.ORG2_PEER_1_URL);
+            //Peer peer0org3_c2 = fabClient_c2.getInstance().newPeer(Config.ORG3_PEER_0, Config.ORG3_PEER_0_URL);
+            //Peer peer1org3_c2 = fabClient_c2.getInstance().newPeer(Config.ORG3_PEER_1, Config.ORG3_PEER_1_URL);
 			Orderer orderer = fabClient_c2.getInstance().newOrderer(Config.ORDERER_NAME, Config.ORDERER_URL);
 			channel.addPeer(peer0org1_c2);
-            channel.addPeer(peer0org2_c2);
+            //channel.addPeer(peer0org2_c2);
             channel.addPeer(peer1org1_c2);
-            channel.addPeer(peer1org2_c2);
-            channel.addPeer(peer0org3_c2);
-            channel.addPeer(peer1org3_c2);
+            //channel.addPeer(peer1org2_c2);
+            //channel.addPeer(peer0org3_c2);
+            //channel.addPeer(peer1org3_c2);
 			channel.addOrderer(orderer);
 			channel.initialize();
 
