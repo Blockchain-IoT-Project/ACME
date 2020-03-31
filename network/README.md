@@ -1,7 +1,7 @@
 ## Build Your First Network (BYFN)
 
-The directions for using this are documented in the Hyperledger Fabric
-["Build Your First Network"](http://hyperledger-fabric.readthedocs.io/en/latest/build_network.html) tutorial.
+To start the network, the cryptographic material has to be generated first. To do this, execute `./byfn.sh generate`
 
-*NOTE:* After navigating to the documentation, choose the documentation version that matches your version of Fabric
+After this, the network can be brought up with `./byfn.sh up`, creating all needed docker containers, starting their respective binaries and setting up the network architecture. Towards the end a few preset transactions will be done to verify the network's functionality as well as adding a third organization to the network after it has already been started.
 
+To bring down the network again, use `./byfn.sh down`. This will stop and delete all related docker containers.
